@@ -1,0 +1,4 @@
+# inKSpot - Hosting Made Easy
+
+inKSpot is a set of scripts for *nix like systems which provide ease of administrating web and e-mail hosting for
+a number of domains.
