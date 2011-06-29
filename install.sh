@@ -33,20 +33,8 @@ if [ $? == 0 ]
 	apt-get -q dist-upgrade
 fi
 
-echo "Adding 'inkspot' user and group to the system..."
-addgroup --system inkspot
-adduser --system --ingroup inkspot inkspot
-mkdir /home/inkspot/www
-chown inkspot:inkspot /home/inkspot/www
-mkdir /home/inkspot/bin
-chown inkspot:inkspot /home/inkspot/bin
-cp -R bin/* /home/inkspot/bin
-
-echo "Updating umask..."
-echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
-
-echo "Installing required software..."
-apt-get -q install postgresql libpam-pgsql                     # Database
+echo "Installing base system software..."
+apt-get -q install postgresql libpam-pgsql libnss-pgsql2       # Database
 apt-get -q install php5 php5-cli php5-cgi php5-pgsql           # PHP Stuff
 apt-get -q install nginx spawn-fcgi mono-fastcgi-server        # WebServer Stuff
 apt-get -q install postfix-tls postfix-pgsql                   # SMTP  Stuff
@@ -57,14 +45,43 @@ apt-get -q install clamsmtp clamav-freshclam                   # Anti-Virus Stuf
 echo "Running freshclam for the first time..."
 freshclam
 
-echo "Setting up inKSpot Database..."
+echo "Adding 'inkspot' user and group to the system..."
+addgroup --system inkspot
+adduser  --system --ingroup inkspot inkspot
+
+##
+# Create our bin directory
+##
+
+mkdir /home/inkspot/bin
+cp -R bin/* /home/inkspot/bin
+chown -R inkspot:inkspot /home/inkspot/bin
+chmod -R 755 /home/inkspot/bin
+
+##
+# Create our www directory
+##
+
+mkdir /home/inkspot/www
+chown -R inkspot:inkspot /home/inkspot/www
+chmod 750 /home/inkspot/www
+
+echo "Updating umask..."
+echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
+umask 007
+
+echo "Setting up inKSpot database and permissions..."
 echo "CREATE USER inkspot;" | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 sudo -u inkspot psql inkspot < support/inkspot.sql
+cp -pR etc/postgres/* /etc/postgres/
 
 echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
 cp support/pam-configs/pgsql /usr/share/pam-configs/
 pam-auth-update --package
+
+echo "Setting up NSS for PostgreSQL..."
+cp etc/nss-pgsql.conf /etc/
 
 

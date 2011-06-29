@@ -1,20 +1,22 @@
 Name: PostgreSQL Table Authentication
 Default: yes
-Priority: 150
+Priority: 500
 Auth-Type: Primary
 Auth:
-        [success=end default=ignore]    pam_pgsql.so cached_login try_first_pass
+        [success=end default=ignore]	pam_pgsql.so try_first_pass
 Auth-Initial:
-        [success=end default=ignore]    pam_pgsql.so cached_login
+        [success=end default=ignore]	pam_pgsql.so
 Account-Type: Primary
 Account:
-        [success=end new_authtok_reqd=done default=ignore]      pam_pgsql.so
+        [success=end new_authtok_reqd=done default=ignore]	pam_pgsql.so
+Account-Initial:
+        [success=end new_authtok_reqd=done default=ignore]	pam_pgsql.so
 Password-Type: Primary
 Password:
-        [success=end default=ignore]    pam_pgsql.so try_first_pass
+        [success=end default=ignore]	pam_pgsql.so try_first_pass
 Password-Initial:
-        [success=end default=ignore]    pam_pgsql.so
+        [success=end default=ignore]	pam_pgsql.so
 Session-Type: Additional
 Session:
-        optional                        pam_pgsql.so
+        optional						pam_pgsql.so
 
