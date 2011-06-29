@@ -8,7 +8,7 @@ UMASK is 007
 	/home/users/<username>/mail/local
 	/home/users/<username>/mail/<domain>  -> symlink to domain's www
 	/home/users/<username>/www
-	/home/users/<username>/network/<user> -> symlink to user's www
+	/home/users/<username>/friends/<user> -> symlink to user's www
 
 	- SFTP Only access is enabled, public keys required
 	- Adding public keys adds to /home/username/.ssh/authorized_keys

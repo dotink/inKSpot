@@ -59,8 +59,11 @@ freshclam
 
 echo "Setting up inKSpot Database..."
 echo "CREATE USER inkspot;" | sudo -u postgres psql
-echo "DROP DATABASE inkspot;" | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 sudo -u inkspot psql inkspot < support/inkspot.sql
+
+echo "Setting up PAM for PostgreSQL..."
+cp support/pam-configs/pgsql /usr/share/pam-configs/
+pam-auth-update --package
 
 

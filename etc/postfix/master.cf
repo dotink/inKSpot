@@ -86,5 +86,5 @@ mailman   unix  -       n       n       -       -       pipe
   ${nexthop} ${user}
 spamassassin unix -     n       n       -       -       pipe
   user=spamd argv=/usr/bin/spamc -f -e
-  /usr/sbin/sasendmail -oi -f $sender $recipient
+  /home/inkspot/bin/sasendmail -oi -f $sender $recipient
 retry     unix  -       -       -       -       -       error

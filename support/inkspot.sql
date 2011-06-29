@@ -1,21 +1,30 @@
+BEGIN;
+
 CREATE TABLE users (
 	id serial PRIMARY KEY,
 	username varchar(32) NOT NULL UNIQUE,
-	password varchar(512) NOT NULL,
+	login_password varchar(512) NOT NULL,
 	name varchar(64) NOT NULL,
-	uid integer NOT NULL,
-	gid integer NOT NULL
+	request_new_password boolean NOT NULL DEFAULT FALSE,
+	account_expired boolean NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE user_settings (
+	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	spam_level float NOT NULL default '6.0'
+);
+
+CREATE TABLE user_friends (
+	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	friend_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (user_id, friend_id)
 );
 
 CREATE TABLE user_public_keys (
 	id serial PRIMARY KEY,
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	description varchar(64) NOT NULL,
 	public_key text NOT NULL
-);
-
-CREATE TABLE user_settings (
-	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	spam_level float NOT NULL default 6.0
 );
 
 CREATE TABLE domains (
@@ -34,13 +43,13 @@ CREATE TABLE domain_aliases (
 
 CREATE TABLE domain_mail_settings (
 	domain_id integer PRIMARY KEY REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	mailboxes integer NOT NULL DEFAULT 0,
-	quota integer NOT NULL DEFAULT 0,
+	mailboxes integer NOT NULL DEFAULT '0',
+	quota integer NOT NULL DEFAULT '0'
 );
 
 CREATE TABLE domain_web_settings (
 	domain_id integer PRIMARY KEY REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	quota integer NOT NULL DEFAULT 0,
+	quota integer NOT NULL DEFAULT '0',
 	enable_php boolean NOT NULL DEFAULT FALSE,
 	enable_asp boolean NOT NULL DEFAULT FALSE
 );
@@ -50,13 +59,12 @@ CREATE TABLE domain_users (
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	alias varchar(32) NOT NULL,
-	password varchar(512) NOT NULL,
+	trusted boolean NOT NULL DEFAULT FALSE,
 	UNIQUE (alias, domain_id)
 );
 
 CREATE TABLE domain_user_settings (
 	domain_user_id integer PRIMARY KEY REFERENCES domain_users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	can_write boolean NOT NULL DEFAULT FALSE,
 	spam_level float DEFAULT NULL
 );
 
@@ -65,3 +73,5 @@ CREATE TABLE domain_user_aliases (
 	alias varchar(32) NOT NULL,
 	PRIMARY KEY (domain_user_id, alias)
 );
+
+END;
