@@ -8,8 +8,8 @@ fi
 
 if [ -z `which dialog` ]
 	then
-	echo "Installing 'dialog' and 'rpl'..."
-	apt-get -q install dialog rpl
+	echo "Installing 'dialog'..."
+	apt-get -q install dialog
 fi
 
 if [ -z `which rpl` ]

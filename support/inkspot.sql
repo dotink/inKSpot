@@ -3,7 +3,8 @@ CREATE TABLE users (
 	username varchar(32) NOT NULL UNIQUE,
 	password varchar(512) NOT NULL,
 	name varchar(64) NOT NULL,
-	uid 
+	uid integer NOT NULL,
+	gid integer NOT NULL
 );
 
 CREATE TABLE user_public_keys (
