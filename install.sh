@@ -63,6 +63,7 @@ echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres
 sudo -u inkspot psql inkspot < support/inkspot.sql
 
 echo "Setting up PAM for PostgreSQL..."
+cp etc/pam_pgsql.conf /etc/
 cp support/pam-configs/pgsql /usr/share/pam-configs/
 pam-auth-update --package
 
