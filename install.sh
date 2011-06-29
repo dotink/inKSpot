@@ -54,8 +54,12 @@ apt-get -q install dovecot-common dovecot-imapd dovecot-pop3d  # POP/IMAP Stuff
 apt-get -q install spamassassin                                # Anti-Spam Stuff
 apt-get -q install clamsmtp clamav-freshclam                   # Anti-Virus Stuff
 
+echo "Running freshclam for the first time..."
+freshclam
+
 echo "Setting up inKSpot Database..."
 echo "CREATE USER inkspot;" | sudo -u postgres psql
+echo "DROP DATABASE inkspot;" | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 sudo -u inkspot psql inkspot < support/inkspot.sql
 
