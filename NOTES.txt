@@ -1,0 +1,27 @@
+UMASK is 007
+
+1) Creating a new user creates a user account and group <username>_group
+
+	/home/users/<username>
+	/home/users/<username>/domains
+	/home/users/<username>/mail
+	/home/users/<username>/mail/local
+	/home/users/<username>/mail/<domain>  -> symlink to domain's www
+	/home/users/<username>/www
+	/home/users/<username>/network/<user> -> symlink to user's www
+
+	- SFTP Only access is enabled, public keys required
+	- Adding public keys adds to /home/username/.ssh/authorized_keys
+	- Trusting a user adds them to your group (can edit ~/www)
+
+2) Creating a new domain creates a group and directory
+
+	/home/domains/<domain>
+	/home/domains/<domain>/www
+	/home/domains/<domain>/mail
+	/home/domains/<domain>/mail/<user>
+
+	- Creator is added to group
+	- Add multiple users to the domain
+	- Trusting a user adds them to the group (can edit ~/www)
+

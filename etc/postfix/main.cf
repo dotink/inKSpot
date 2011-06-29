@@ -31,7 +31,7 @@ alias_maps                       = pgsql:/etc/inkspot/postfix/aliases
 
 # sender restrictions
 
-smtpd_sender_restrictions        = reject_unauth_pipelining, permit_mynetworks, permit_sasl_authenticated, reject_non_fqdn_sender, reject_unknown_sender_domain, permit
+smtpd_sender_restrictions        = reject_unauth_pipelining, permit_sasl_authenticated, permit_mynetworks, reject_non_fqdn_sender, reject_unknown_sender_domain, permit
 relay_domains                    = pgsql:/etc/inkspot/postfix/relay_domains
 
 

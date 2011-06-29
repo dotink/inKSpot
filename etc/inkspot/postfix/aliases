@@ -1,0 +1,5 @@
+hosts    = localhost
+user     = inkspot
+password = password
+dbname   = inkspot
+query    = SELECT address FROM aliases WHERE alias='%s'
