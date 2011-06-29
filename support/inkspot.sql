@@ -32,7 +32,7 @@ CREATE TABLE domains (
 	parent_id integer REFERENCES domains(id) ON DELETE SET NULL ON UPDATE CASCADE,
 	name varchar(256) NOT NULL,
 	description varchar(256) NOT NULL,
-	owner integer NOT NULL REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	owner integer NOT NULL REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE domain_aliases (
