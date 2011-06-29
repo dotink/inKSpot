@@ -46,17 +46,17 @@ echo "Updating umask..."
 echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
 
 echo "Installing required software..."
-apt-get install postgresl libpam-pgsql                     \ # Database
-				php5 php5-cli php5-cgi php5-pgsql          \ # PHP Stuff
-				nginx spawn-fcgi mono-fastcgi-server       \ # WebServer Stuff
-				postfix-tls postfix-pgsql                  \ # SMTP  Stuff
-				dovecot-common dovecot-imapd dovecot-pop3d \ # POP/IMAP Stuff
-				spamassassin                               \ # Anti-Spam Stuff
-				clamsmtp clamav-freshclam                    # Anti-Virus Stuff
+apt-get -q install postgresql libpam-pgsql                     # Database
+apt-get -q install php5 php5-cli php5-cgi php5-pgsql           # PHP Stuff
+apt-get -q install nginx spawn-fcgi mono-fastcgi-server        # WebServer Stuff
+apt-get -q install postfix-tls postfix-pgsql                   # SMTP  Stuff
+apt-get -q install dovecot-common dovecot-imapd dovecot-pop3d  # POP/IMAP Stuff
+apt-get -q install spamassassin                                # Anti-Spam Stuff
+apt-get -q install clamsmtp clamav-freshclam                   # Anti-Virus Stuff
 
 echo "Setting up inKSpot Database..."
-echo "CREATE USER inkspot;" | sudo postgres psql
-echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo postgres psql
+echo "CREATE USER inkspot;" | sudo -u postgres psql
+echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 sudo -u inkspot psql inkspot < support/inkspot.sql
 
 
