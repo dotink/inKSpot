@@ -8,7 +8,7 @@ CREATE TABLE groups (
 	groupname varchar(64) NOT NULL,
 	description text,
 	login_password varchar(512),
-	PRIMARY KEY id
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE users (
@@ -22,13 +22,13 @@ CREATE TABLE users (
 	last_password_change int4 NOT NULL,
 	request_new_password boolean NOT NULL DEFAULT FALSE,
 	account_expired boolean NOT NULL DEFAULT FALSE,
-	PRIMARY KEY id
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE user_groups (
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	user_id int4 NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	PRIMARY KEYT (group_id, user_id)
+	PRIMARY KEY (group_id, user_id)
 );
 
 CREATE TABLE user_settings (
