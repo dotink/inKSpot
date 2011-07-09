@@ -15,11 +15,16 @@ CREATE TABLE users (
 	id int4 NOT NULL DEFAULT nextval('user_id'),
 	username varchar(32) NOT NULL UNIQUE,
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	login_password varchar(512) NOT NULL,
+	login_password varchar(512) NOT NULL DEFAULT '*',
 	name varchar(64) NOT NULL,
 	home varchar(512) NOT NULL,
 	shell varchar(512) NOT NULL DEFAULT '/bin/false',
-	last_password_change int4 NOT NULL,
+	last_change_days int NOT NULL DEFAULT CURRENT_DATE - DATE '1970-01-01',
+	min_change_days int NOT NULL DEFAULT '0',
+	max_change_days int NOT NULL DEFAULT '9999',
+	warn_days int4 NOT NULL DEFAULT '7',
+	disable_inactive_days int4 DEFAULT NULL,
+	expiration_days int DEFAULT NULL,
 	request_new_password boolean NOT NULL DEFAULT FALSE,
 	account_expired boolean NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (id)
@@ -33,7 +38,7 @@ CREATE TABLE user_groups (
 
 CREATE TABLE user_settings (
 	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	spam_level float NOT NULL default '6.0'
+	spam_level float NOT NULL DEFAULT '6.0'
 );
 
 CREATE TABLE user_friends (

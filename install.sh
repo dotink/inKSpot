@@ -80,8 +80,11 @@ echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
 cp support/pam-configs/pgsql /usr/share/pam-configs/
 pam-auth-update --package
+/etc/init.d/postgresql restart
 
 echo "Setting up NSS for PostgreSQL..."
 cp etc/nss-pgsql.conf /etc/
+cp etc/nss-pgsql-root.conf /etc/
+cp etc/nsswitch.conf /etc/
 
 
