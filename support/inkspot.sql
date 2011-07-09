@@ -30,15 +30,15 @@ CREATE TABLE users (
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE user_settings (
+	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	spam_level float NOT NULL DEFAULT '6.0'
+);
+
 CREATE TABLE user_groups (
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	user_id int4 NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (group_id, user_id)
-);
-
-CREATE TABLE user_settings (
-	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	spam_level float NOT NULL DEFAULT '6.0'
 );
 
 CREATE TABLE user_friends (
