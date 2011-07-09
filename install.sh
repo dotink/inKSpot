@@ -9,19 +9,19 @@ fi
 if [ -z `which dialog` ]
 	then
 	echo "Installing 'dialog'..."
-	apt-get -q install dialog
+	apt-get -qq install dialog
 fi
 
 if [ -z `which rpl` ]
 	then
 	echo "Installing 'rpl'..."
-	apt-get -q install rpl
+	apt-get -qq install rpl
 fi
 
 if [ -z `which sudo` ]
 	then
 	echo "Installing 'sudo'..."
-	apt-get -q install sudo
+	apt-get -qq install sudo
 fi
 
 dialog --yesno "Do you wish to update the system? (RECOMMENDED)" 5 80
@@ -29,18 +29,18 @@ dialog --yesno "Do you wish to update the system? (RECOMMENDED)" 5 80
 if [ $? == 0 ]
 	then
 	echo "Updating..."
-	apt-get -q update
-	apt-get -q dist-upgrade
+	apt-get -qq update
+	apt-get -qq dist-upgrade
 fi
 
 echo "Installing base system software..."
-apt-get -q install postgresql libpam-pgsql libnss-pgsql2       # Database
-apt-get -q install php5 php5-cli php5-cgi php5-pgsql           # PHP Stuff
-apt-get -q install nginx spawn-fcgi mono-fastcgi-server        # WebServer Stuff
-apt-get -q install postfix-tls postfix-pgsql                   # SMTP  Stuff
-apt-get -q install dovecot-common dovecot-imapd dovecot-pop3d  # POP/IMAP Stuff
-apt-get -q install spamassassin                                # Anti-Spam Stuff
-apt-get -q install clamsmtp clamav-freshclam                   # Anti-Virus Stuff
+apt-get -qq install postgresql libpam-pgsql libnss-pgsql2       # Database
+apt-get -qq install php5 php5-cli php5-cgi php5-pgsql           # PHP Stuff
+apt-get -qq install nginx spawn-fcgi mono-fastcgi-server        # WebServer Stuff
+apt-get -qq install postfix-tls postfix-pgsql                   # SMTP  Stuff
+apt-get -qq install dovecot-common dovecot-imapd dovecot-pop3d  # POP/IMAP Stuff
+apt-get -qq install spamassassin                                # Anti-Spam Stuff
+apt-get -qq install clamsmtp clamav-freshclam                   # Anti-Virus Stuff
 
 echo "Running freshclam for the first time..."
 freshclam
@@ -50,9 +50,14 @@ addgroup --system inkspot
 adduser  --system --ingroup inkspot inkspot
 
 ##
+# Add inkspot user to root group and allow write to /home
+##
+useradd -G root inkspot
+chmod 775 /home
+
+##
 # Create our bin directory
 ##
-
 mkdir /home/inkspot/bin
 cp -R bin/* /home/inkspot/bin
 chown -R inkspot:inkspot /home/inkspot/bin
@@ -61,7 +66,6 @@ chmod -R 755 /home/inkspot/bin
 ##
 # Create our www directory
 ##
-
 mkdir /home/inkspot/www
 chown -R inkspot:inkspot /home/inkspot/www
 chmod 750 /home/inkspot/www
@@ -86,5 +90,3 @@ echo "Setting up NSS for PostgreSQL..."
 cp etc/nss-pgsql.conf /etc/
 cp etc/nss-pgsql-root.conf /etc/
 cp etc/nsswitch.conf /etc/
-
-
