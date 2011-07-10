@@ -93,6 +93,7 @@ psql -U inkspot < support/inkspot.sql
 
 echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
+chmod 644 /etc/pam_pgsql.conf
 cp support/pam-configs/pgsql /usr/share/pam-configs/
 pam-auth-update --package
 
