@@ -75,7 +75,7 @@ echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
 umask 007
 
 echo "Reconfiguring postgres authentication..."
-for ver_dir in `ls -1 /etc/postgres`; do
+for ver_dir in `ls -1 /etc/postgresql`; do
 	cp etc/postgres/pg_hba.conf /etc/postgres/$ver_dir/main/
 	chown postgres:postgres /etc/postgres/$ver_dir/main/pg_hba.conf
 	cp etc/postgres/pg_ident.conf /etc/postgres/$ver_dir/main/
