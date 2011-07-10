@@ -17,7 +17,7 @@ CREATE TABLE users (
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	description varchar(512) NOT NULL,
 	home varchar(512) NOT NULL,
-	shell varchar(512) NOT NULL DEFAULT '/bin/false',
+	shell varchar(512) NOT NULL DEFAULT '/bin/false'
 );
 
 CREATE TABLE user_shadows (
