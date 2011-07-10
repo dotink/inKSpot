@@ -47,6 +47,7 @@ CREATE TABLE user_groups (
 CREATE TABLE user_friends (
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	friend_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	trusted boolean NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (user_id, friend_id)
 );
 
@@ -60,15 +61,10 @@ CREATE TABLE user_public_keys (
 CREATE TABLE domains (
 	id serial PRIMARY KEY,
 	parent_id integer REFERENCES domains(id) ON DELETE SET NULL ON UPDATE CASCADE,
-	name varchar(256) NOT NULL,
+	domain varchar(256) NOT NULL UNIQUE,
 	description varchar(256) NOT NULL,
+	alias_for varchar(256) REFERENCES domains(domain) ON DELETE CASCADE ON UPDATE CASCADE,
 	owner integer NOT NULL REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-CREATE TABLE domain_aliases (
-	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	alias varchar(256) NOT NULL,
-	PRIMARY KEY (domain_id, alias)
 );
 
 CREATE TABLE domain_mail_settings (
@@ -88,7 +84,7 @@ CREATE TABLE domain_users (
 	id serial PRIMARY KEY,
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	alias varchar(32) NOT NULL,
+	username varchar(32) NOT NULL,
 	trusted boolean NOT NULL DEFAULT FALSE,
 	UNIQUE (alias, domain_id)
 );
@@ -100,7 +96,7 @@ CREATE TABLE domain_user_settings (
 
 CREATE TABLE domain_user_aliases (
 	domain_user_id integer NOT NULL REFERENCES domain_users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	alias varchar(32) NOT NULL,
+	alias varchar(384) NOT NULL,
 	PRIMARY KEY (domain_user_id, alias)
 );
 

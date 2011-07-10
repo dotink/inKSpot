@@ -1,0 +1,4 @@
+user   = inkspot
+hosts  = localhost
+dbname = inkspot
+query  = SELECT alias FROM domain_user_aliases WHERE domain_user_id = (SELECT id FROM domain_users WHERE username = '%u' AND (domain_id = (SELECT id FROM domains WHERE domain = '%d')))

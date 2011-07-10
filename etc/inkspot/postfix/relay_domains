@@ -1,0 +1,4 @@
+user   = inkspot
+hosts  = localhost
+dbname = inkspot
+query  = SELECT domain FROM domains WHERE domain='%s'
