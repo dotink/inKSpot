@@ -76,10 +76,10 @@ umask 007
 
 echo "Reconfiguring postgres authentication..."
 for ver_dir in `ls -1 /etc/postgresql`; do
-	cp etc/postgres/pg_hba.conf /etc/postgres/$ver_dir/main/
-	chown postgres:postgres /etc/postgres/$ver_dir/main/pg_hba.conf
-	cp etc/postgres/pg_ident.conf /etc/postgres/$ver_dir/main/
-	chown postgres:postgres /etc/postgres/$ver_dir/main/pg_ident.conf
+	cp etc/postgres/pg_hba.conf /etc/postgresql/$ver_dir/main/
+	chown postgres:postgres /etc/postgresql/$ver_dir/main/pg_hba.conf
+	cp etc/postgres/pg_ident.conf /etc/postgresql/$ver_dir/main/
+	chown postgres:postgres /etc/postgresql/$ver_dir/main/pg_ident.conf
 done
 /etc/init.d/postgresql restart
 
