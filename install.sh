@@ -86,8 +86,7 @@ done
 echo "Setting up inKSpot database and permissions..."
 echo "CREATE USER inkspot;" | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
-sudo -u inkspot psql inkspot < support/inkspot.sql
-cp -pR etc/postgres/* /etc/postgres/
+psql -U inkspot < support/inkspot.sql
 
 echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
