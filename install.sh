@@ -86,7 +86,8 @@ done
 password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
 
 echo "Setting up inKSpot database and permissions..."
-echo "CREATE USER inkspot PASSWORD '$password';" | sudo -u postgres psql
+echo "CREATE USER inkspot" | sudo -u postgres psql
+echo "CREATE USER inkspot_ro PASSWORD '$password';" | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 psql -U inkspot < support/inkspot.sql
 
@@ -98,10 +99,9 @@ pam-auth-update --package
 echo "Setting up NSS for PostgreSQL..."
 cp etc/nss-pgsql.conf /etc/
 rpl -q \$\{password\} $password /etc/nss-pgsql.conf >/dev/null
-chmod 600 /etc/nss-pgsql.conf
+chmod 644 /etc/nss-pgsql.conf
 
 cp etc/nss-pgsql-root.conf /etc/
-rpl -q \$\{password\} $password /etc/nss-pgsql-root.conf >/dev/null
-chmod 600 /etc/nss-pgsql-root.conf
+chmod 644 /etc/nss-pgsql-root.conf
 
 cp etc/nsswitch.conf /etc/

@@ -12,13 +12,17 @@ CREATE TABLE groups (
 );
 
 CREATE TABLE users (
-	id int4 NOT NULL DEFAULT nextval('user_id'),
+	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('user_id'),
 	username varchar(32) NOT NULL UNIQUE,
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	login_password varchar(512) NOT NULL DEFAULT '*',
-	name varchar(64) NOT NULL,
+	description varchar(512) NOT NULL,
 	home varchar(512) NOT NULL,
 	shell varchar(512) NOT NULL DEFAULT '/bin/false',
+);
+
+CREATE TABLE user_shadows (
+	username varchar(32) NOT NULL PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	login_password varchar(512) NOT NULL DEFAULT '*',
 	last_change_days int NOT NULL DEFAULT CURRENT_DATE - DATE '1970-01-01',
 	min_change_days int NOT NULL DEFAULT '0',
 	max_change_days int NOT NULL DEFAULT '9999',
@@ -26,8 +30,8 @@ CREATE TABLE users (
 	disable_inactive_days int4 DEFAULT NULL,
 	expiration_days int DEFAULT NULL,
 	request_new_password boolean NOT NULL DEFAULT FALSE,
-	account_expired boolean NOT NULL DEFAULT FALSE,
-	PRIMARY KEY (id)
+	account_expired boolean NOT NULL DEFAULT FALSE
+
 );
 
 CREATE TABLE user_settings (
@@ -100,5 +104,9 @@ CREATE TABLE domain_user_aliases (
 	alias varchar(32) NOT NULL,
 	PRIMARY KEY (domain_user_id, alias)
 );
+
+GRANT SELECT ON users TO inkspot_ro;
+GRANT SELECT ON groups TO inkspot_ro;
+GRANT SELECT ON user_groups TO inkspot_ro;
 
 END;
