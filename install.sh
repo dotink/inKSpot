@@ -97,11 +97,11 @@ pam-auth-update --package
 
 echo "Setting up NSS for PostgreSQL..."
 cp etc/nss-pgsql.conf /etc/
-rpl -q \$\{password\} $password /etc/nss-pgsql.conf
+rpl -q \$\{password\} $password /etc/nss-pgsql.conf >/dev/null
 chmod 600 /etc/nss-pgsql.conf
 
 cp etc/nss-pgsql-root.conf /etc/
-rpl -q \$\{password\} $password /etc/nss-pgsql-root.conf
+rpl -q \$\{password\} $password /etc/nss-pgsql-root.conf >/dev/null
 chmod 600 /etc/nss-pgsql-root.conf
 
 cp etc/nsswitch.conf /etc/
