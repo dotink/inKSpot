@@ -74,6 +74,15 @@ echo "Updating umask..."
 echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
 umask 007
 
+echo "Reconfiguring postgres authentication..."
+for ver_dir in `ls -1 /etc/postgres`; do
+	cp etc/postgres/pg_hba.conf /etc/postgres/$ver_dir/main/
+	chown postgres:postgres /etc/postgres/$ver_dir/main/pg_hba.conf
+	cp etc/postgres/pg_ident.conf /etc/postgres/$ver_dir/main/
+	chown postgres:postgres /etc/postgres/$ver_dir/main/pg_ident.conf
+done
+/etc/init.d/postgresql restart
+
 echo "Setting up inKSpot database and permissions..."
 echo "CREATE USER inkspot;" | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
@@ -84,7 +93,6 @@ echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
 cp support/pam-configs/pgsql /usr/share/pam-configs/
 pam-auth-update --package
-/etc/init.d/postgresql restart
 
 echo "Setting up NSS for PostgreSQL..."
 cp etc/nss-pgsql.conf /etc/
