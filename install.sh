@@ -101,5 +101,7 @@ rpl -q \$\{password\} $password /etc/nss-pgsql.conf
 chmod 600 /etc/nss-pgsql.conf
 
 cp etc/nss-pgsql-root.conf /etc/
-rpl -q \$\{password\} $password /etc/nss-pgsql.conf
+rpl -q \$\{password\} $password /etc/nss-pgsql-root.conf
+chmod 600 /etc/nss-pgsql-root.conf
+
 cp etc/nsswitch.conf /etc/
