@@ -27,11 +27,10 @@ CREATE TABLE user_shadows (
 	min_change_days int NOT NULL DEFAULT '0',
 	max_change_days int NOT NULL DEFAULT '9999',
 	warn_days int4 NOT NULL DEFAULT '7',
-	disable_inactive_days int4 DEFAULT NULL,
-	expiration_days int DEFAULT NULL,
-	request_new_password boolean NOT NULL DEFAULT FALSE,
-	account_expired boolean NOT NULL DEFAULT FALSE
-
+	disable_inactive_days int4 DEFAULT '7',
+	expiration_days int DEFAULT '36500',
+	account_expired boolean NOT NULL DEFAULT FALSE,
+	request_new_password boolean NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE user_settings (
