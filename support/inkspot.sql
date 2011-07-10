@@ -6,7 +6,7 @@ CREATE SEQUENCE user_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 CREATE TABLE groups (
 	id int4 NOT NULL DEFAULT nextval('group_id'),
 	groupname varchar(64) NOT NULL,
-	description text,
+	description text DEFAULT NULL,
 	login_password varchar(512),
 	PRIMARY KEY (id)
 );
