@@ -1,0 +1,32 @@
+#!/bin/bash
+
+IW_CONSOLE="/home/inkspot/www/iw.console"
+BIN_DIR="/home/inkspot/bin"
+RETVAL=0
+
+case "$1" in
+	start)
+		$IW_CONSOLE $BIN_DIR/start-inkspot
+		RETVAL=$?
+	;;
+	stop)
+		$IW_CONSOLE $BIN_DIR/stop-inkspot
+		RETVAL=$?
+	;;
+	restart)
+		$IW_CONSOLE $BIN_DIR/stop-inkspot
+		RETVAL=$?
+		if [$RETVAL]; then
+			exit $RETVAL;
+		else
+			$IW_CONSOLE $BIN_DIR/start-inkspot			
+		fi
+		RETVAL=$?
+	;;
+	*)
+		echo "Usage: inkwell {start|stop|restart}"
+		exit 1
+	;;
+esac      
+exit $RETVAL
+

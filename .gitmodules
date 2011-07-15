@@ -1,3 +1,6 @@
 [submodule "lib/flourish"]
 	path = lib/flourish
 	url = git://github.com/dotink/flourish.git
+[submodule "www"]
+	path = www
+	url = git@github.com:dotink/inKWell.git
