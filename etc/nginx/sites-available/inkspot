@@ -4,6 +4,7 @@ server {
 
 	root         /home/inkspot/www/writable;
 	index        index.php;
+	error_page   502 ../index.html;
 
 	gzip         on;
 	gzip_disable "MSIE [1-6]\.(?!.*SV1)";

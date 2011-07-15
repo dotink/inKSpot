@@ -112,4 +112,9 @@ cp etc/nsswitch.conf /etc/
 echo "Adding inkspot hostname to /etc/hosts..."
 echo "127.0.2.1 inkspot" >> /etc/hosts
 
+echo "Adding configuration to NGINX..."
+cp etc/nginx/sites-available/inkspot /etc/nginx/sites-available/inkspot
+ln -s /etc/nginx/sites-available/inkspot /etc/nginx/sites-enabled/inkspot
+/etc/init.d/nginx/restart
+
 
