@@ -52,9 +52,9 @@ adduser  --system --ingroup inkspot inkspot
 ##
 # Add inkspot user to root group and allow write to /home
 ##
-useradd -G root inkspot
-useradd -G www-data inkspot
-useradd -G inkspot www-data
+adduser inkspot root
+adduser www-data inkspot
+adduser inkspot www-data
 chmod 775 /home
 
 ##
