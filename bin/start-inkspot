@@ -1,0 +1,16 @@
+<?php
+
+define('CGI_CMD',        '/usr/bin/spawn-fcgi');
+define('PHP_START_PORT', 65000);
+define('PHP_CGI',        '/usr/bin/php5-cgi');
+
+echo "Spawning FCGI Processes";
+$cmd = implode(' ', array(
+	CGI_CMD,
+	'-a 127.0.0.1',
+	'-p ' . PHP_START_PORT,
+	'-u inkspot',
+	'-g inkspot',
+	'-f ' . PHP_CGI
+));
+echo `$cmd`;
