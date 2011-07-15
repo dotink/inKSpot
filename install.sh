@@ -63,12 +63,13 @@ chmod 775 /home
 mkdir /home/inkspot/bin
 cp -R bin/* /home/inkspot/bin
 chown -R inkspot:inkspot /home/inkspot/bin
-chmod -R 755 /home/inkspot/bin
+chmod -R 750 /home/inkspot/bin
 
 ##
 # Create our www directory
 ##
 mkdir /home/inkspot/www
+cp -R www/* /home/inkspot/www
 chown -R inkspot:inkspot /home/inkspot/www
 chmod 750 /home/inkspot/www
 
