@@ -49,7 +49,7 @@
 				//
 				// <address>:<port>
 
-				'hosts' => array('localhost'),
+				'hosts' => array('sock:'),
 			),
 		),
 	));
