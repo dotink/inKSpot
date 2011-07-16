@@ -17,7 +17,7 @@ UMASK is 007
 2) Creating a new domain creates a group and directory
 
 	/home/domains/<domain>
-	/home/domains/<domain>/www
+	/home/domains/<domain>/www/docroot
 	/home/domains/<domain>/mail
 	/home/domains/<domain>/mail/<user>
 

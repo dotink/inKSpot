@@ -6,23 +6,13 @@ if [ `id -u` != '0' ]
 	exit
 fi
 
-if [ -z `which dialog` ]
-	then
-	echo "Installing 'dialog'..."
-	apt-get -qq install dialog
-fi
+REQUIRED_BASE_SOFTWARE=(dialog rpl sudo rlwrap)
 
-if [ -z `which rpl` ]
-	then
-	echo "Installing 'rpl'..."
-	apt-get -qq install rpl
-fi
-
-if [ -z `which sudo` ]
-	then
-	echo "Installing 'sudo'..."
-	apt-get -qq install sudo
-fi
+for i in ${REQUIRED_BASE_SOFTWARE[*]}; do
+	if [ -z `which $i` ]; then
+		apt-get -qq install $i;
+	fi
+done
 
 dialog --yesno "Do you wish to update the system? (RECOMMENDED)" 5 80
 
@@ -63,7 +53,6 @@ chmod 775 /home
 mkdir /home/inkspot/bin
 cp -R bin/* /home/inkspot/bin
 chown -R inkspot:inkspot /home/inkspot/bin
-chmod -R 750 /home/inkspot/bin
 
 ##
 # Create our www directory
@@ -71,7 +60,22 @@ chmod -R 750 /home/inkspot/bin
 mkdir /home/inkspot/www
 cp -R www/* /home/inkspot/www
 chown -R inkspot:inkspot /home/inkspot/www
-chmod 750 /home/inkspot/www
+
+##
+# Create our lib directory
+##
+mkdir /home/inkspot/www
+cp -R lib/* /home/inkspot/lib
+chown -R inkspot:inkspot /home/inkspot/lib
+chmod -R 750 /home/inkspot
+
+##
+# Allow www-data to write to nginx configs
+##
+chgrp www-data /etc/nginx/sites-available
+chgrp www-data /etc/nginx/sites-enabled
+chmod 770 /etc/nginx/sites-enabled
+chmod 770 /etc/nginx/sites-available
 
 echo "Updating umask..."
 echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
