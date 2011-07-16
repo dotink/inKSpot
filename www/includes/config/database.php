@@ -2,7 +2,7 @@
 
 	return iw::createConfig('Core', array(
 
-		'disabled'  => TRUE,
+		'disabled'  => FALSE,
 		'databases' => array(
 
 			// Multiple databases can be configured.  If database support is
@@ -28,12 +28,12 @@
 				// Both the type and name are required and should be a string
 				// value.
 
-				'type' => NULL,
-				'name' => NULL,
+				'type' => 'postgresql',
+				'name' => 'inkspot',
 
 				// Authentication information if required
 
-				'user'     => NULL,
+				'user'     => 'inkspot',
 				'password' => NULL,
 
 				// If the host parameter is configured as an array then inKWell
@@ -49,7 +49,7 @@
 				//
 				// <address>:<port>
 
-				'hosts' => array('127.0.0.1'),
+				'hosts' => array('localhost'),
 			),
 		),
 	));
