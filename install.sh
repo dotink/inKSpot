@@ -84,6 +84,7 @@ chown inkspot:inkspot /etc/inkspot
 
 echo "Updating umask..."
 echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
+rpl "umask 022" "umask 007" /etc/profile
 umask 007
 
 echo "Reconfiguring postgres authentication..."

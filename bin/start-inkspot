@@ -13,7 +13,7 @@ $cmd = implode(' ', array(
 ));
 echo `$cmd`;
 
-foreach (Domains as $domain) {
+foreach (Domains::build() as $domain) {
 	$cmd = implode(' ', array(
 		CGI_CMD,
 		'-s /home/inkspot/var/cgi/domains/' . $domain->getDomain() '.php',
