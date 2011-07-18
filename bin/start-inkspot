@@ -1,16 +1,24 @@
 <?php
 
 define('CGI_CMD',        '/usr/bin/spawn-fcgi');
-define('PHP_START_PORT', 65000);
 define('PHP_CGI',        '/usr/bin/php5-cgi');
 
 echo "Spawning FCGI Processes";
 $cmd = implode(' ', array(
 	CGI_CMD,
-	'-a 127.0.0.1',
-	'-p ' . PHP_START_PORT,
+	'-s /home/inkspot/var/cgi/inkspot',
 	'-u inkspot',
 	'-g inkspot',
 	'-f ' . PHP_CGI
 ));
 echo `$cmd`;
+
+foreach (Domains as $domain) {
+	$cmd = implode(' ', array(
+		CGI_CMD,
+		'-s /home/inkspot/var/cgi/domains/' . $domain->getDomain(),
+		'-u ' . $domain->createUser()->getUsername(),
+		'-g ' . $domain->getDomain(),
+		'-f ' . PHP_CGI
+	));
+}

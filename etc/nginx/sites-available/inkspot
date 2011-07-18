@@ -23,7 +23,7 @@ server {
 	location ~ \.php {
 		error_page 502 /index.html
 	
-		fastcgi_pass             127.0.0.1:65000;
+		fastcgi_pass             unix:/home/inkspot/var/cgi/inkspot;
 		fastcgi_index            index.php;
 		fastcgi_read_timeout     300;
 		fastcgi_intercept_errors on;
@@ -38,3 +38,4 @@ server {
 	}
 }
 
+include /etc/inkspot/nginx/*

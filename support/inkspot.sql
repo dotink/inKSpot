@@ -4,11 +4,10 @@ CREATE SEQUENCE group_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 CREATE SEQUENCE user_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 
 CREATE TABLE groups (
-	id int4 NOT NULL DEFAULT nextval('group_id'),
+	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('group_id'),
 	groupname varchar(64) NOT NULL,
 	description text DEFAULT NULL,
-	login_password varchar(512),
-	PRIMARY KEY (id)
+	login_password varchar(512) DEFAULT 'x'
 );
 
 CREATE TABLE users (
@@ -60,7 +59,6 @@ CREATE TABLE user_public_keys (
 
 CREATE TABLE domains (
 	id serial PRIMARY KEY,
-	parent_id integer REFERENCES domains(id) ON DELETE SET NULL ON UPDATE CASCADE,
 	domain varchar(256) NOT NULL UNIQUE,
 	description varchar(256) NOT NULL,
 	alias_for varchar(256) REFERENCES domains(domain) ON DELETE CASCADE ON UPDATE CASCADE,

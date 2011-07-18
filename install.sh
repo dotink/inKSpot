@@ -77,6 +77,12 @@ chgrp www-data /etc/nginx/sites-enabled
 chmod 770 /etc/nginx/sites-enabled
 chmod 770 /etc/nginx/sites-available
 
+##
+# Give inkspot a configuration home
+##
+mkdir /etc/inkspot
+chown inkspot:inkspot /etc/inkspot
+
 echo "Updating umask..."
 echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
 umask 007
@@ -117,9 +123,16 @@ cp etc/nsswitch.conf /etc/
 echo "Adding inkspot hostname to /etc/hosts..."
 echo "127.0.2.1 inkspot" >> /etc/hosts
 
-echo "Adding configuration to NGINX..."
+echo "Setting up NGINX..."
 cp etc/nginx/sites-available/inkspot /etc/nginx/sites-available/inkspot
 ln -s /etc/nginx/sites-available/inkspot /etc/nginx/sites-enabled/inkspot
+cp -R etc/inkspot/nginx /etc/inkspot/
+chown inkspot:inkspot /etc/inkspot/nginx
 /etc/init.d/nginx/restart
 
-
+echo "Setting up Spawn-FCGI environment..."
+mkdir /home/inkspot/var
+mkdir /home/inkspot/var/cgi
+mkdir /home/inkspot/var/cgi/domains
+mkdir /home/inkspot/var/cgi/users
+chown -R inkspot:inkspot /home/inkspot/var
