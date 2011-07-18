@@ -16,7 +16,7 @@ echo `$cmd`;
 foreach (Domains as $domain) {
 	$cmd = implode(' ', array(
 		CGI_CMD,
-		'-s /home/inkspot/var/cgi/domains/' . $domain->getDomain(),
+		'-s /home/inkspot/var/cgi/domains/' . $domain->getDomain() '.php',
 		'-u ' . $domain->createUser()->getUsername(),
 		'-g ' . $domain->getDomain(),
 		'-f ' . PHP_CGI

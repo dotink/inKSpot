@@ -27,7 +27,7 @@ echo "Installing base system software..."
 apt-get -qq install postgresql libpam-pgsql libnss-pgsql2       # Database
 apt-get -qq install php5 php5-cli php5-cgi php5-pgsql           # PHP Stuff
 apt-get -qq install nginx spawn-fcgi mono-fastcgi-server        # WebServer Stuff
-apt-get -qq install postfix-tls postfix-pgsql                   # SMTP  Stuff
+apt-get -qq install postfix postfix-pgsql                       # SMTP  Stuff
 apt-get -qq install dovecot-common dovecot-imapd dovecot-pop3d  # POP/IMAP Stuff
 apt-get -qq install spamassassin                                # Anti-Spam Stuff
 apt-get -qq install clamsmtp clamav-freshclam                   # Anti-Virus Stuff
@@ -64,7 +64,6 @@ chown -R inkspot:inkspot /home/inkspot/www
 ##
 # Create our lib directory
 ##
-mkdir /home/inkspot/www
 cp -R lib/* /home/inkspot/lib
 chown -R inkspot:inkspot /home/inkspot/lib
 chmod -R 750 /home/inkspot
@@ -128,7 +127,7 @@ cp etc/nginx/sites-available/inkspot /etc/nginx/sites-available/inkspot
 ln -s /etc/nginx/sites-available/inkspot /etc/nginx/sites-enabled/inkspot
 cp -R etc/inkspot/nginx /etc/inkspot/
 chown inkspot:inkspot /etc/inkspot/nginx
-/etc/init.d/nginx/restart
+/etc/init.d/nginx restart
 
 echo "Setting up Spawn-FCGI environment..."
 mkdir /home/inkspot/var
