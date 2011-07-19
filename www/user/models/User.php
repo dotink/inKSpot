@@ -182,6 +182,9 @@
 					);
 
 				} catch (fException $e) {
+
+					fFilesystem::rollback();
+
 					throw new fEnvironmentException (
 						'Unable to build requirements for user account.'
 					);
