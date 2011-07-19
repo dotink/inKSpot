@@ -174,7 +174,10 @@
 
 				// Operations performed prior to user account creation
 
+				fFilesystem::begin();
+
 				try {
+
 					$home      = fDirectory::create('/home/users/' . $username);
 					$www       = fDirectory::create($home          . 'www');
 					$localwww  = fDirectory::create($www           . 'local');
@@ -182,11 +185,7 @@
 					$docroot   = fDirectory::create($userwww       . 'docroot');
 					$mail      = fDirectory::create($home          . 'mail');
 				} catch (fValidationException $e) {
-
-					if ($home) {
-						$home->delete();
-					}
-
+					fFilesystem::rollback();
 					throw new fEnvironmentException (
 						'Could not build home directory for user %s',
 						$username
@@ -198,6 +197,7 @@
 					$group->setGroupname($values['username']);
 					$group->store();	
 				} catch (fException $e) {
+					fFilesystem::rollback();
 					throw new fEnvironmentException (
 						'Could not create group for user %s',
 						$username
@@ -226,6 +226,7 @@
 					$shadow->setUsername($username);
 					$shadow->store();
 				} catch (fException $e) {
+					fFilesystem::rollback();
 					throw new fEnvironmentException (
 						'Unable to create shadow for user %s',
 						$username
@@ -233,6 +234,7 @@
 				}
 
 				fORMDatabase::retrieve(__CLASS__, 'write')->query("COMMIT");
+				fFilesystem::commit();
 
 				sexec('chown -R ' . $username . ' ' . $home);
 				sexec('chgrp -R ' . $username . ' ' . $home);

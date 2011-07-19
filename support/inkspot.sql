@@ -102,4 +102,4 @@ GRANT SELECT ON users TO inkspot_ro;
 GRANT SELECT ON groups TO inkspot_ro;
 GRANT SELECT ON user_groups TO inkspot_ro;
 
-END;
+COMMIT;

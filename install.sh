@@ -35,7 +35,9 @@ apt-get -qq install clamsmtp clamav-freshclam                   # Anti-Virus Stu
 echo "Running freshclam for the first time..."
 freshclam
 
-echo "Adding 'inkspot' user and group to the system..."
+##
+# Create accounts, these will output their own information
+##
 addgroup --system inkspot
 adduser  --system --ingroup inkspot inkspot
 
