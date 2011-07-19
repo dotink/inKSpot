@@ -222,6 +222,7 @@
 				try {
 					$shadow = new UserShadow();
 					$shadow->setUsername($username);
+					$shadow->setLastChangeDays(floor(time() / 60 / 60 / 24));
 					$shadow->store();
 				} catch (fException $e) {
 					fFilesystem::rollback();
