@@ -66,7 +66,7 @@ chown -R inkspot:inkspot /home/inkspot/www
 ##
 cp -R lib/* /home/inkspot/lib
 chown -R inkspot:inkspot /home/inkspot/lib
-chmod -R 750 /home/inkspot
+chmod -R 770 /home/inkspot/lib
 
 ##
 # Allow www-data to write to nginx configs

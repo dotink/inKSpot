@@ -84,7 +84,7 @@ CREATE TABLE domain_users (
 	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	username varchar(32) NOT NULL,
 	trusted boolean NOT NULL DEFAULT FALSE,
-	UNIQUE (alias, domain_id)
+	UNIQUE (username, domain_id)
 );
 
 CREATE TABLE domain_user_settings (
