@@ -161,8 +161,6 @@
 		{
 			if (!$user->exists() && !self::$building) {
 
-				fORMDatabase::retrieve(__CLASS__, 'write')->query("BEGIN");
-
 				$username  = $values['username'];
 
 				if (count(Users::build(array('username=' => $username)))) {
@@ -222,7 +220,7 @@
 				$username = $values['username'];
 
 				try {
-					$shadow   = new UserShadow();
+					$shadow = new UserShadow();
 					$shadow->setUsername($username);
 					$shadow->store();
 				} catch (fException $e) {
@@ -233,7 +231,6 @@
 					);
 				}
 
-				fORMDatabase::retrieve(__CLASS__, 'write')->query("COMMIT");
 				fFilesystem::commit();
 
 				sexec('chown -R ' . $username . ' ' . $home);
