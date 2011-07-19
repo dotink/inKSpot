@@ -161,56 +161,82 @@
 		{
 			if (!$user->exists() && !self::$building) {
 
-				self::$building = TRUE;
+				fORMDatabase::retrieve(__CLASS__, 'write')->query("BEGIN");
+
+				$username  = $values['username'];
+
+				if (count(Users::build(array('username=' => $username)))) {
+					throw new fValidationException (
+						'The username %s already exists',
+						$username
+					);
+				}
 
 				// Operations performed prior to user account creation
 
 				try {
-				
-					$username  = $values['username'];
 					$home      = fDirectory::create('/home/users/' . $username);
 					$www       = fDirectory::create($home          . 'www');
 					$localwww  = fDirectory::create($www           . 'local');
 					$userwww   = fDirectory::create($localwww      . $username);
 					$docroot   = fDirectory::create($userwww       . 'docroot');
 					$mail      = fDirectory::create($home          . 'mail');
+				} catch (fValidationException $e) {
 
-					$group = new Group();
-					$group->setGroupname($values['username']);
-					$group->store();
-	
-					$values['group_id'] = $group->getId();
-					$values['home']     = $home->getPath();
-
-					fORM::registerHookCallback(
-						__CLASS__,
-						'post-commit::store()',
-						iw::makeTarget(__CLASS__, 'buildAccount')
-					);
-
-				} catch (fException $e) {
+					if ($home) {
+						$home->delete();
+					}
 
 					throw new fEnvironmentException (
-						'Unable to build requirements for user account.'
+						'Could not build home directory for user %s',
+						$username
 					);
+				} 
 
-					self::$building = TRUE;
+				try {
+					$group = new Group();
+					$group->setGroupname($values['username']);
+					$group->store();	
+				} catch (fException $e) {
+					throw new fEnvironmentException (
+						'Could not create group for user %s',
+						$username
+					);
 				}
+
+				$values['home']     = $home->getPath();
+				$values['group_id'] = $group->getId();
+				self::$building     = TRUE;
+
+				fORM::registerHookCallback(
+					__CLASS__,
+					'post-commit::store()',
+					iw::makeTarget(__CLASS__, 'buildAccount')
+				);
 
 			} else {
 
 				// Operations performed after user account creation
 
-				$shadow   = new UserShadow();
 				$home     = $values['home'];
 				$username = $values['username'];
 
-				$shadow->setUsername($username);
-				$shadow->store();
+				try {
+					$shadow   = new UserShadow();
+					$shadow->setUsername($username);
+					$shadow->store();
+				} catch (fException $e) {
+					throw new fEnvironmentException (
+						'Unable to create shadow for user %s',
+						$username
+					);
+				}
 
-				exec('chown -R ' . $username . ' ' . $home, $o, $r);
-				exec('chgrp -R ' . $username . ' ' . $home, $o, $r);
-				exec('chmod g+s ' . $home . 'www/local/' . $username, $o, $r);
+				fORMDatabase::retrieve(__CLASS__, 'write')->query("COMMIT");
+
+				sexec('chown -R ' . $username . ' ' . $home);
+				sexec('chgrp -R ' . $username . ' ' . $home);
+				sexec('chmod g+s ' . $home . 'www/local/' . $username);
 
 				self::$building = FALSE;
 			}
