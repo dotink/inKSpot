@@ -9,6 +9,15 @@
 	 */
 	class User extends ActiveRecord
 	{
+	
+		/**
+		 * @var boolean
+		 * @static
+		 * @access private
+		 *
+		 * Whether or not we are building an account
+		 */
+		static private $building = FALSE;
 
 		/**
 		 * Initializes all static class information for the User model
@@ -150,14 +159,14 @@
 		 */
 		static public function buildAccount($user, &$values)
 		{
-			if (!$user->exists()) {
+			if (!$user->exists() && !self::$building) {
+
+				self::$building = TRUE;
 
 				// Operations performed prior to user account creation
 
 				try {
 				
-					fFilesystem::begin();
-
 					$username  = $values['username'];
 					$home      = fDirectory::create('/home/users/' . $username);
 					$www       = fDirectory::create($home          . 'www');
@@ -165,8 +174,6 @@
 					$userwww   = fDirectory::create($localwww      . $username);
 					$docroot   = fDirectory::create($userwww       . 'docroot');
 					$mail      = fDirectory::create($home          . 'mail');
-
-					fFilesystem::commit();
 
 					$group = new Group();
 					$group->setGroupname($values['username']);
@@ -183,11 +190,11 @@
 
 				} catch (fException $e) {
 
-					fFilesystem::rollback();
-
 					throw new fEnvironmentException (
 						'Unable to build requirements for user account.'
 					);
+
+					self::$building = TRUE;
 				}
 
 			} else {
@@ -205,6 +212,7 @@
 				exec('chgrp -R ' . $username . ' ' . $home, $o, $r);
 				exec('chmod g+s ' . $home . 'www/local/' . $username, $o, $r);
 
+				self::$building = FALSE;
 			}
 		}
 		
