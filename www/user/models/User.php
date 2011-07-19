@@ -28,13 +28,6 @@
 				'pre::validate()',
 				iw::makeTarget(__CLASS__, 'buildAccount')
 			);
-
-			fORM::registerHookCallback(
-				__CLASS__,
-				'post-commit::store()',
-				iw::makeTarget(__CLASS__, 'buildAccount')
-			);
-
 		}
 
 		/**
@@ -161,22 +154,38 @@
 
 				// Operations performed prior to user account creation
 
-				fFilesystem::begin();
-				$username  = $values['username'];
-				$home      = fDirectory::create('/home/users/' . $username);
-				$www       = fDirectory::create($home          . 'www');
-				$localwww  = fDirectory::create($www           . 'local');
-				$userwww   = fDirectory:;create($localwww      . $username);
-				$docroot   = fDirectory::create($userwww       . 'docroot');
-				$mail      = fDirectory::create($home          . 'mail');
-				fFilesystem::commit();
+				try {
+				
+					fFilesystem::begin();
 
-				$group = new Group();
-				$group->setGroupname($values['username']);
-				$group->store();
+					$username  = $values['username'];
+					$home      = fDirectory::create('/home/users/' . $username);
+					$www       = fDirectory::create($home          . 'www');
+					$localwww  = fDirectory::create($www           . 'local');
+					$userwww   = fDirectory::create($localwww      . $username);
+					$docroot   = fDirectory::create($userwww       . 'docroot');
+					$mail      = fDirectory::create($home          . 'mail');
+
+					fFilesystem::commit();
+
+					$group = new Group();
+					$group->setGroupname($values['username']);
+					$group->store();
 	
-				$values['group_id'] = $group->getId();
-				$values['home']     = $home->getPath();
+					$values['group_id'] = $group->getId();
+					$values['home']     = $home->getPath();
+
+					fORM::registerHookCallback(
+						__CLASS__,
+						'post-commit::store()',
+						iw::makeTarget(__CLASS__, 'buildAccount')
+					);
+
+				} catch (fException $e) {
+					throw new fEnvironmentException (
+						'Unable to build requirements for user account.'
+					);
+				}
 
 			} else {
 
@@ -184,7 +193,7 @@
 
 				$shadow   = new UserShadow();
 				$home     = $values['home'];
-				$username = $values['username']
+				$username = $values['username'];
 
 				$shadow->setUsername($username);
 				$shadow->store();
