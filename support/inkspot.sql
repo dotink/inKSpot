@@ -14,7 +14,7 @@ CREATE TABLE users (
 	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('user_id'),
 	username varchar(32) NOT NULL UNIQUE,
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	description varchar(512) NOT NULL,
+	description varchar(512) NOT NULL DEFAULT ',,,',
 	home varchar(512) NOT NULL,
 	shell varchar(512) NOT NULL DEFAULT '/bin/false'
 );
