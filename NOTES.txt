@@ -1,14 +1,16 @@
-UMASK is 007
+1) Creating a new user:
 
-1) Creating a new user creates a user account and group <username>_group
+	Create <username>        -- Cannot contain periods
+	Create Group <username>
+	Add 'inkspot' user to the group
+	
+	Create Directories:
 
-	/home/users/<username>
-	/home/users/<username>/domains
-	/home/users/<username>/mail
-	/home/users/<username>/mail/local
-	/home/users/<username>/mail/<domain>  -> symlink to domain's www
-	/home/users/<username>/www
-	/home/users/<username>/friends/<user> -> symlink to user's www
+		/home/users/<username>
+		/home/users/<username>/mail/local
+		/home/users/<username>/mail/<domain>
+		/home/users/<username>/www/local/<user>/docroot
+		/home/users/<username>/www/<domain>/docroot
 
 	- SFTP Only access is enabled, public keys required
 	- Adding public keys adds to /home/username/.ssh/authorized_keys
