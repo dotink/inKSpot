@@ -22,6 +22,19 @@
 		static public function __init(array $config = array(), $element = NULL)
 		{
 			parent::__init($config, $element);
+
+			fORM::registerHookCallback(
+				__CLASS__,
+				'pre::validate()',
+				iw::makeTarget(__CLASS__, 'buildAccount')
+			);
+
+			fORM::registerHookCallback(
+				__CLASS__,
+				'post-commit::store()',
+				iw::makeTarget(__CLASS__, 'buildAccount')
+			);
+
 		}
 
 		/**
@@ -132,5 +145,60 @@
 		{
 			return parent::createFromResourceKey(__CLASS__, $resource_key);
 		}
+
+		/**
+		 * Logic for when a new user is added to a system.  This method is run
+		 * prior to validation and after commiting the user to the database in
+		 * order to establish initial group membership and home directory
+		 * structure.
+		 *
+		 * @static
+		 * @access public
+		 */
+		static public function buildAccount($user, &$values)
+		{
+			if (!$user->exists()) {
+
+				// Operations performed prior to user account creation
+
+				fFilesystem::begin();
+				$username  = $values['username'];
+				$home      = fDirectory::create('/home/users/' . $username);
+				$www       = fDirectory::create($home          . 'www');
+				$localwww  = fDirectory::create($www           . 'local');
+				$userwww   = fDirectory:;create($localwww      . $username);
+				$docroot   = fDirectory::create($userwww       . 'docroot');
+				$mail      = fDirectory::create($home          . 'mail');
+				fFilesystem::commit();
+
+				$group = new Group();
+				$group->setGroupname($values['username']);
+				$group->store();
+	
+				$values['group_id'] = $group->getId();
+				$values['home']     = $home->getPath();
+
+			} else {
+
+				// Operations performed after user account creation
+
+				$shadow   = new UserShadow();
+				$home     = $values['home'];
+				$username = $values['username']
+
+				$shadow->setUsername($username);
+				$shadow->store();
+
+				exec('chown -R ' . $username . ' ' . $home, $o, $r);
+				exec('chgrp -R ' . $username . ' ' . $home, $o, $r);
+				exec('chmod g+s ' . $home . 'www/local/' . $username, $o, $r);
+
+			}
+		}
+		
+		/**
+		 *
+		 */
+
 
 	}
