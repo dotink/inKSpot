@@ -3,7 +3,7 @@
 define('CGI_CMD',        '/usr/bin/spawn-fcgi');
 define('PHP_CGI',        '/usr/bin/php5-cgi');
 
-echo "Spawning FCGI Processes";
+echo "Spawning FCGI Processes\n";
 $cmd = implode(' ', array(
 	CGI_CMD,
 	'-s /home/inkspot/var/cgi/inkspot',
@@ -21,6 +21,7 @@ foreach (Domains::build() as $domain) {
 		'-g ' . $domain->getDomain(),
 		'-f ' . PHP_CGI
 	));
+	echo `$cmd`;
 }
 
 foreach (Users::build() as $user) {
@@ -31,4 +32,5 @@ foreach (Users::build() as $user) {
 		'-g ' . $user->getUsername(),
 		'-f ' . PHP_CGI		
 	));
+	echo `$cmd`;
 }
