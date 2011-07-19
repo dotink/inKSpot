@@ -2130,7 +2130,17 @@ class fDatabase
 		// Track transactions since most databases don't support nesting
 		if (preg_match('#^\s*(BEGIN|START)(\s+(TRAN|TRANSACTION|WORK))?\s*$#iD', $sql)) {
 			if ($this->inside_transaction) {
-				throw new fProgrammerException('A transaction is already in progress');
+				switch ($this->type) {
+					case 'psotgresql':
+					case 'mysql':
+						$this->query('SAVEPOINT ' . md5(microtime()));
+						break;
+					case 'mssql':
+						break;
+					default:
+						throw new fProgrammerException('A transaction is already in progress');
+						break;
+				}
 			}
 			$this->inside_transaction = TRUE;
 			$begin = TRUE;

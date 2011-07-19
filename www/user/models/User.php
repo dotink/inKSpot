@@ -210,7 +210,7 @@
 
 				fORM::registerHookCallback(
 					__CLASS__,
-					'post-commit::store()',
+					'post::store()',
 					iw::makeTarget(__CLASS__, 'buildAccount')
 				);
 
