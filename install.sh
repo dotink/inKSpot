@@ -87,6 +87,20 @@ echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
 rpl "umask 022" "umask 007" /etc/profile
 umask 007
 
+echo "Giving inkspot some binaries..."
+mkdir /home/inkspot/sbin
+chown inkspot:inkspot /home/inkspot/sbin
+chmod -R 770 /home/inkspot/sbin
+REQUIRED_SUID_BINARIES=(chown chgrp chmod)
+for i in ${REQUIRED_SUID_BINARIES[*]}; do
+	BIN_LOCATION=`which $i`
+	if [ $BIN_LOCATION ]; then
+		cp $BIN_LOCATION /home/inkspot/sbin
+	fi
+done
+chown -R root:inkspot /home/inkspot/sbin
+chmod 4750 /home/inkspot/sbin/*
+
 echo "Reconfiguring postgres authentication..."
 for ver_dir in `ls -1 /etc/postgresql`; do
 	cp etc/postgres/pg_hba.conf /etc/postgresql/$ver_dir/main/
