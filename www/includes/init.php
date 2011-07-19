@@ -18,6 +18,8 @@
 	/**
 	 * You can add customized initialization logic here
 	 */
+	 
+	umask(0007);
 
 	$config = iw::init(CONFIGURATION);
 
