@@ -2130,35 +2130,25 @@ class fDatabase
 		// Track transactions since most databases don't support nesting
 		if (preg_match('#^\s*(BEGIN|START)(\s+(TRAN|TRANSACTION|WORK))?\s*$#iD', $sql)) {
 			if ($this->inside_transaction) {
-				switch ($this->type) {
-					case 'psotgresql':
-					case 'mysql':
-						$this->query('SAVEPOINT ' . md5(microtime()));
-						break;
-					case 'mssql':
-						break;
-					default:
-						throw new fProgrammerException('A transaction is already in progress');
-						break;
-				}
-			}
-			$this->inside_transaction = TRUE;
-			$begin = TRUE;
-			
+				// throw new fProgrammerException('A transaction is already in progress');
+			} else {
+				$this->inside_transaction = TRUE;
+				$begin = TRUE;
+			}		
 		} elseif (preg_match('#^\s*COMMIT(\s+(TRAN|TRANSACTION|WORK))?\s*$#iD', $sql)) {
 			if (!$this->inside_transaction) {
 				throw new fProgrammerException('There is no transaction in progress');
-			}
-			$this->inside_transaction = FALSE;
-			$commit = TRUE;
-			
+			} else {
+				$this->inside_transaction = FALSE;
+				$commit = TRUE;
+			}		
 		} elseif (preg_match('#^\s*ROLLBACK(\s+(TRAN|TRANSACTION|WORK))?\s*$#iD', $sql)) {
 			if (!$this->inside_transaction) {
 				throw new fProgrammerException('There is no transaction in progress');
-			}
-			$this->inside_transaction = FALSE;
-			$rollback = TRUE;
-		
+			} else {
+				$this->inside_transaction = FALSE;
+				$rollback = TRUE;
+			}	
 		// MySQL needs to use this construct for starting transactions when using LOCK tables
 		} elseif ($this->type == 'mysql' && preg_match('#^\s*SET\s+autocommit\s*=\s*(0|1)#i', $sql, $match)) {
 			$this->inside_transaction = TRUE;
