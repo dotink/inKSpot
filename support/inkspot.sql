@@ -32,21 +32,20 @@ CREATE TABLE user_shadows (
 	request_new_password boolean NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE user_settings (
-	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	spam_level float NOT NULL DEFAULT '6.0'
-);
-
 CREATE TABLE user_groups (
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	user_id int4 NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (group_id, user_id)
 );
 
+CREATE TABLE user_settings (
+	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	spam_level float NOT NULL DEFAULT '6.0'
+);
+
 CREATE TABLE user_friends (
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	friend_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	trusted boolean NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (user_id, friend_id)
 );
 

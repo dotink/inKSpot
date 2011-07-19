@@ -37,6 +37,13 @@
 				'pre::validate()',
 				iw::makeTarget(__CLASS__, 'buildAccount')
 			);
+
+			fORM::registerHookCallback(
+				__CLASS__,
+				'post::store()',
+				iw::makeTarget(__CLASS__, 'buildAccount')
+			);
+
 		}
 
 		/**
@@ -156,8 +163,11 @@
 		 *
 		 * @static
 		 * @access public
+		 * @param User $user The User Object
+		 * @param array $values The array of current property values
+		 * @return void
 		 */
-		static public function buildAccount($user, &$values)
+		static public function buildAccount(User $user, &$values)
 		{
 			if (!$user->exists() && !self::$building) {
 
@@ -175,13 +185,14 @@
 				fFilesystem::begin();
 
 				try {
-
 					$home      = fDirectory::create('/home/users/' . $username);
 					$www       = fDirectory::create($home          . 'www');
 					$localwww  = fDirectory::create($www           . 'local');
 					$userwww   = fDirectory::create($localwww      . $username);
 					$docroot   = fDirectory::create($userwww       . 'docroot');
 					$mail      = fDirectory::create($home          . 'mail');
+					$sshdir    = fDirectory::create($home          . '.ssh');
+					$auth_keys = fFile::create($sshdir . 'authorized_keys');
 				} catch (fValidationException $e) {
 					fFilesystem::rollback();
 					throw new fEnvironmentException (
@@ -204,13 +215,8 @@
 
 				$values['home']     = $home->getPath();
 				$values['group_id'] = $group->getId();
-				self::$building     = TRUE;
 
-				fORM::registerHookCallback(
-					__CLASS__,
-					'post::store()',
-					iw::makeTarget(__CLASS__, 'buildAccount')
-				);
+				self::$building     = TRUE;
 
 			} else {
 
@@ -234,17 +240,103 @@
 
 				fFilesystem::commit();
 
-				sexec('chown -R ' . $username . ' ' . $home);
-				sexec('chgrp -R ' . $username . ' ' . $home);
-				sexec('chmod g+s ' . $home . 'www/local/' . $username);
+				// User owns their home, but it falls under group inkspot
+				// so that trusted users cannot view outside of their
+				// affiliates userwww directory
+
+				sexec('chown -R '         . $username . ' ' . $home);
+				sexec('chgrp -R inkspot ' . $home);
+				sexec('chown -R g+s '     . $home);
+
+				// Make .ssh folders owned by inkspot so they cannot
+				// be modified by user via SSH
+
+				sexec('chown -R inkspot ' . $home . '.ssh');
+
+				// Make the user's www have their group and change
+				// to g+s so all files and dirs created within it also
+				// have that group
+								
+				$userwww = $home . 'www/local' . $username;
+
+				sexec('chgrp -R  ' . $username . ' ' . $userwww)
+				sexec('chmod g+s ' . $userwww);
 
 				self::$building = FALSE;
 			}
 		}
 		
 		/**
+		 * Attempts to create a user from a somewhat ambiguous parameter
 		 *
+		 * @static
+		 * @access public
+		 * @param int|string|User $user The identifier for the user
+		 * @return User The user object
 		 */
+		static public function create($user)
+		{
+			if (!is_object($user) || !($user instanceof User)) {
+				if (is_numeric($user)) {
+					$user = new User($user);
+				} else {
+					$user = new User(array('username' => $user));
+				}
+			}
+			
+			return $user;
+		}
+		
+		/**
+		 * Adds trust between the user and another user
+		 *
+		 * @access public
+		 * @param int|string|User The User, user id, or username to trust
+		 * @return void
+		 */
+		public function addTrust($user)
+		{
+			$user = self::create($user);
 
+			fORMDatabase::retrieve(__CLASS__)->query(
+				'INSERT INTO user_groups(user_id, group_id) VALUES(%i, %i)',
+				$user->getId(),
+				$this->createGroup()->getId()
+			);
+		}
 
+		/**
+		 * Removes trust between the user and another user
+		 *
+		 * @access public
+		 * @param int|string|User The User, user id, or username to trust
+		 * @return void
+		 */
+		public function removeTrust($user)
+		{
+			$user = self::create($user);
+
+			fORMDatabase::retrieve(__CLASS__)->query(
+				'DELETE FROM user_groups WHERE user_id=%i AND group_id=%i',
+				$user->getId(),
+				$this->createGroup()->getId()
+			);
+		}
+
+		/**
+		 * Checks whether or not a user is trusted by the user
+		 * @access public
+		 * @param int|string|User The User, user id, or username to trust
+		 * @return boolean Whether or not the user is trusted	 
+		 */
+		public function checkTrust($user)
+		{
+			$user = self::create($user);
+			
+			return fORMDatabase::retrieve(__CLASS__)->query(
+				'SELECT * FROM user_groups WHERE user_id=%i AND group_id=%i',
+				$user->getId(),
+				$this->createGroup()->getId()
+			)->countReturnedRows();		
+		}
 	}
