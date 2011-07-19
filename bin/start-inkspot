@@ -16,9 +16,19 @@ echo `$cmd`;
 foreach (Domains::build() as $domain) {
 	$cmd = implode(' ', array(
 		CGI_CMD,
-		'-s /home/inkspot/var/cgi/domains/' . $domain->getDomain() '.php',
+		'-s /home/inkspot/var/cgi/domains/' . $domain->getDomain() . '.php',
 		'-u ' . $domain->createUser()->getUsername(),
 		'-g ' . $domain->getDomain(),
 		'-f ' . PHP_CGI
+	));
+}
+
+foreach (Users::build() as $user) {
+	$cmd = implode(' ', array(
+		CGI_CMD,
+		'-s /home/inkspot/var/cgi/users/' . $user->getUsername() . '.php',
+		'-u ' . $user->getUsername(),
+		'-g ' . $user->getUsername(),
+		'-f ' . PHP_CGI		
 	));
 }
