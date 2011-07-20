@@ -259,7 +259,7 @@
 								
 				$userwww = $home . 'www/local' . $username;
 
-				sexec('chgrp -R  ' . $username . ' ' . $userwww)
+				sexec('chgrp -R  ' . $username . ' ' . $userwww);
 				sexec('chmod g+s ' . $userwww);
 
 				self::$building = FALSE;
@@ -303,6 +303,13 @@
 				$user->getId(),
 				$this->createGroup()->getId()
 			);
+			
+			$src_user = $this->getUsername();
+			$dst_user = $user->getUsername();
+			$src      = '/home/users/' . $src_user . '/www/local' . $src_user;
+			$dst      = '/home/users/' . $dst_user . '/www/local' . $src_user;
+
+			exec('ln -s ' . $src . ' ' . $dst);
 		}
 
 		/**
@@ -321,6 +328,12 @@
 				$user->getId(),
 				$this->createGroup()->getId()
 			);
+
+			$src_user = $this->getUsername();
+			$dst_user = $user->getUsername();
+			$dst      = '/home/users/' . $dst_user . '/www/local' . $src_user;
+			
+			exec('rm ' . $dst);
 		}
 
 		/**
