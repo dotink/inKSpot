@@ -16,8 +16,7 @@ done
 
 dialog --yesno "Do you wish to update the system? (RECOMMENDED)" 5 80
 
-if [ $? == 0 ]
-	then
+if [ $? == 0 ]; then
 	echo "Updating..."
 	apt-get -qq update
 	apt-get -qq dist-upgrade
@@ -67,6 +66,8 @@ chown -R inkspot:inkspot /home/inkspot/bin
 mkdir /home/inkspot/www
 cp -R www/* /home/inkspot/www
 chown -R inkspot:inkspot /home/inkspot/www
+ln -s /home/inkspot/www/styles  /home/inkspot/www/writable/
+ln -s /home/inkspot/www/scripts /home/inkspot/www/writable/
 
 ##
 # Create our lib directory
