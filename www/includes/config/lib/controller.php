@@ -43,7 +43,7 @@
 		'sections'        => array(
 
 			'default'     => array(
-				'title'   => 'inKWell Site',
+				'title'   => 'Social Web and E-mail Hosting for Everyone',
 				'use_ssl' => FALSE
 			),
 		),
