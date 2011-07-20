@@ -20,3 +20,4 @@ echo "DROP USER inkspot_ro" | sudo -u postgres psql
 rm -rf /home/inkspot
 rm -rf /home/users
 rm -rf /home/domains
+rm -rf /etc/inkspot

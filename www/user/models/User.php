@@ -218,7 +218,7 @@
 
 				self::$building = TRUE;
 
-			} else {
+			} elseif (self::$building) {
 
 				// Operations performed after user account creation
 
@@ -261,6 +261,10 @@
 
 				sexec('chgrp -R  ' . $username . ' ' . $userwww);
 				sexec('chmod g+s ' . $userwww);
+				sexec('chmod a+x ' . $home);
+				sexec('chmod a+x ' . $home . 'www');
+				sexec('chmod a+x ' . $home . 'www/local');
+				sexec('chmod a+x ' . $userwww);
 
 				self::$building = FALSE;
 
