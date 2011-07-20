@@ -8,11 +8,14 @@ if [ `ps -A | grep nginx | head -1` ]; then
 	killall -9 nginx
 fi
 
+rpl -q " pgsql" "" /etc/nsswitch.conf
+
+userdel inkspot
+groupdel inkspot
+
 echo "DROP DATABASE inkspot" | sudo -u postgres psql
 echo "DROP USER inkspot" | sudo -u postgres psql
 echo "DROP USER inkspot_ro" | sudo -u postgres psql
-
-rpl -q " pgsql" "" /etc/nsswitch.conf
 
 rm -rf /home/inkspot
 rm -rf /home/users
