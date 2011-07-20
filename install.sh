@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd /tmp
-
 if [ `id -u` != '0' ]
 	then
 	echo "You must run the installation as root"
