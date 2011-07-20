@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ `ps -A | grep php5-cgi | head -1` ]; then
+if [ "`ps -A | grep php5-cgi | head -1`" ]; then
 	killall -9 php5-cgi
 fi
 
-if [ `ps -A | grep nginx | head -1` ]; then
+if [ "`ps -A | grep nginx | head -1`" ]; then
 	killall -9 nginx
 fi
 

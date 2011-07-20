@@ -216,9 +216,11 @@
 				$values['home']     = $home->getPath();
 				$values['group_id'] = $group->getId();
 
-				self::$building     = TRUE;
+				self::$building = TRUE;
 
 			} elseif (self::$building) {
+
+				self::$building = FALSE;
 
 				// Operations performed after user account creation
 
@@ -262,7 +264,6 @@
 				sexec('chgrp -R  ' . $username . ' ' . $userwww);
 				sexec('chmod g+s ' . $userwww);
 
-				self::$building = FALSE;
 			}
 		}
 		
