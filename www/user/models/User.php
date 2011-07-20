@@ -192,7 +192,7 @@
 					$docroot   = fDirectory::create($userwww       . 'docroot');
 					$mail      = fDirectory::create($home          . 'mail');
 					$sshdir    = fDirectory::create($home          . '.ssh');
-					$auth_keys = fFile::create($sshdir . 'authorized_keys');
+					$auth_keys = fFile::create($sshdir . 'authorized_keys', '');
 				} catch (fValidationException $e) {
 					fFilesystem::rollback();
 					throw new fEnvironmentException (
