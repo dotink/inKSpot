@@ -169,7 +169,7 @@
 		 */
 		static public function buildAccount(User $user, &$values)
 		{
-			if (!$user->exists()) {
+			if (!$user->exists() && !self::$building) {
 
 				$username  = $values['username'];
 
@@ -218,9 +218,7 @@
 
 				self::$building = TRUE;
 
-			} elseif (self::$building) {
-
-				self::$building = FALSE;
+			} else {
 
 				// Operations performed after user account creation
 
@@ -263,6 +261,8 @@
 
 				sexec('chgrp -R  ' . $username . ' ' . $userwww);
 				sexec('chmod g+s ' . $userwww);
+
+				self::$building = FALSE;
 
 			}
 		}
