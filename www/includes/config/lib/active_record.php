@@ -10,7 +10,7 @@
 		// Whether or not we should attempt to auto scaffold records using this
 		// class.
 
-		'auto_scaffold' => FALSE,
+		'auto_scaffold' => TRUE,
 
 		// The directory relative to inkwell root in which user defined
 		// active record models are stored.  This will be used by the auto-
