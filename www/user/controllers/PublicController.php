@@ -21,7 +21,7 @@
 			parent::prepare();
 
 			$this -> view
-				  -> add  ('styles', '/user/styles/public/main.css')
+				  -> add  ('styles', '/styles/public/main.css')
 				  -> add  ('header', 'public/header.php')
 				  -> pack ('id',     self::getAction());
 
