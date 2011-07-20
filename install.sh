@@ -24,6 +24,7 @@ if [ $? == 0 ]
 fi
 
 echo "Installing base system software..."
+apt-get -qq install rssh                                        # Restricted Shell
 apt-get -qq install postgresql libpam-pgsql libnss-pgsql2       # Database
 apt-get -qq install php5 php5-cli php5-cgi php5-pgsql           # PHP Stuff
 apt-get -qq install nginx spawn-fcgi mono-fastcgi-server        # WebServer Stuff
