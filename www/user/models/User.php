@@ -169,7 +169,7 @@
 		 */
 		static public function buildAccount(User $user, &$values)
 		{
-			if (!$user->exists() && !self::$building) {
+			if (!$user->exists()) {
 
 				$username  = $values['username'];
 
