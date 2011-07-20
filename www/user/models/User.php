@@ -218,7 +218,7 @@
 
 				self::$building     = TRUE;
 
-			} else {
+			} elseif (self::$building) {
 
 				// Operations performed after user account creation
 
