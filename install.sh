@@ -47,7 +47,11 @@ adduser  --system --ingroup inkspot inkspot
 adduser inkspot root
 adduser www-data inkspot
 adduser inkspot www-data
-chmod 775 /home
+mkdir /home/users
+chgrp inkspot /home/users
+mkdir /home/domains
+chgrp inkspot /home/domains
+chmod -R 771 /home
 
 ##
 # Create our bin directory

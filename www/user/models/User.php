@@ -310,6 +310,7 @@
 			$dst      = '/home/users/' . $dst_user . '/www/local/' . $src_user;
 
 			exec('ln -s ' . $src . ' ' . $dst);
+			exec('chmod 775 ' . $dst);
 		}
 
 		/**
