@@ -246,7 +246,7 @@
 
 				sexec('chown -R '         . $username . ' ' . $home);
 				sexec('chgrp -R inkspot ' . $home);
-				sexec('chown -R g+s '     . $home);
+				sexec('chmod -R g+s '     . $home);
 
 				// Make .ssh folders owned by inkspot so they cannot
 				// be modified by user via SSH
@@ -257,7 +257,7 @@
 				// to g+s so all files and dirs created within it also
 				// have that group
 								
-				$userwww = $home . 'www/local' . $username;
+				$userwww = $home . 'www/local/' . $username;
 
 				sexec('chgrp -R  ' . $username . ' ' . $userwww);
 				sexec('chmod g+s ' . $userwww);
@@ -306,8 +306,8 @@
 			
 			$src_user = $this->getUsername();
 			$dst_user = $user->getUsername();
-			$src      = '/home/users/' . $src_user . '/www/local' . $src_user;
-			$dst      = '/home/users/' . $dst_user . '/www/local' . $src_user;
+			$src      = '/home/users/' . $src_user . '/www/local/' . $src_user;
+			$dst      = '/home/users/' . $dst_user . '/www/local/' . $src_user;
 
 			exec('ln -s ' . $src . ' ' . $dst);
 		}
@@ -331,7 +331,7 @@
 
 			$src_user = $this->getUsername();
 			$dst_user = $user->getUsername();
-			$dst      = '/home/users/' . $dst_user . '/www/local' . $src_user;
+			$dst      = '/home/users/' . $dst_user . '/www/local/' . $src_user;
 			
 			exec('rm ' . $dst);
 		}
