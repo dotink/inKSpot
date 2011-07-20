@@ -66,8 +66,8 @@ chown -R inkspot:inkspot /home/inkspot/bin
 mkdir /home/inkspot/www
 cp -R www/* /home/inkspot/www
 chown -R inkspot:inkspot /home/inkspot/www
-ln -s /home/inkspot/www/styles  /home/inkspot/www/writable/
-ln -s /home/inkspot/www/scripts /home/inkspot/www/writable/
+ln -s /home/inkspot/www/user/styles  /home/inkspot/www/writable/
+ln -s /home/inkspot/www/user/scripts /home/inkspot/www/writable/
 
 ##
 # Create our lib directory
