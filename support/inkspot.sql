@@ -130,14 +130,14 @@ INSERT INTO web_engines (name, cgi_path) VALUES('ruby', '/usr/bin/ruby-cgi');
 
 INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
 	'PHP5',
-	SELECT id FROM web_engines WHERE name = 'php5',
+	(SELECT id FROM web_engines WHERE name = 'php5'),
 	'Standard PHP support for files ending with .php',
 	'/etc/inkspot/nginx/php.tmpl'
 );
 
 INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
 	'Ruby',
-	SELECT id FROM web_engines WHERE name = 'ruby',
+	(SELECT id FROM web_engines WHERE name = 'ruby',
 	'Standard Ruby support for files ending with .rb',
 	'/etc/inkspot/nginx/ruby.tmpl'
 );
