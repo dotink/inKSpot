@@ -21,6 +21,7 @@ CREATE TABLE users (
 
 CREATE TABLE user_shadows (
 	username varchar(32) NOT NULL PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	email_address varchar(256) NOT NULL,
 	login_password varchar(512) DEFAULT NULL,
 	last_change_days int NOT NULL DEFAULT CURRENT_DATE - DATE '1970-01-01',
 	min_change_days int NOT NULL DEFAULT '0',
@@ -72,9 +73,7 @@ CREATE TABLE domain_mail_settings (
 
 CREATE TABLE domain_web_settings (
 	domain_id integer PRIMARY KEY REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	quota integer NOT NULL DEFAULT '0',
-	enable_php boolean NOT NULL DEFAULT FALSE,
-	enable_asp boolean NOT NULL DEFAULT FALSE
+	quota integer NOT NULL DEFAULT '0'
 );
 
 CREATE TABLE domain_users (
@@ -82,7 +81,6 @@ CREATE TABLE domain_users (
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	username varchar(32) NOT NULL,
-	trusted boolean NOT NULL DEFAULT FALSE,
 	UNIQUE (username, domain_id)
 );
 
@@ -97,8 +95,51 @@ CREATE TABLE domain_user_aliases (
 	PRIMARY KEY (domain_user_id, alias)
 );
 
+CREATE TABLE web_engines (
+	id serial PRIMARY KEY NOT NULL,
+	name varchar(16) NOT NULL UNIQUE,
+	cgi_path varchar(512) NOT NULL
+)
+
+CREATE TABLE web_configurations (
+	id serial PRIMARY KEY NOT NULL,
+	web_engine integer NOT NULL REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	name varchar(128) NOT NULL UNIQUE,
+	description text NOT NULL,
+	template varchar(512) NOT NULL	
+);
+
+CREATE TABLE user_web_configurations (
+	user_id interger NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	web_configuration_id integer NOT NULL REFERENCES web_configurations(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (user_id, web_configuration_id)
+);
+
+CREATE TABLE domain_web_configurations (
+	domain_id interger NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	web_configuration_id integer NOT NULL REFERENCES web_configurations(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (user_id, web_configuration_id)
+);
+
 GRANT SELECT ON users TO inkspot_ro;
 GRANT SELECT ON groups TO inkspot_ro;
 GRANT SELECT ON user_groups TO inkspot_ro;
+
+INSERT INTO web_engines (name, cgi_path) VALUES('PHP5', '/usr/bin/php5-cgi');
+INSERT INTO web_engines (name, cgi_path) VALUES('Ruby', '/usr/bin/ruby-cgi');
+
+INSERT INTO web_configurations (name, web_engine, description, template) VALUES(
+	'PHP5',
+	(SELECT name FROM web_engines WHERE name = 'PHP5'),
+	'Standard PHP support for files ending with .php',
+	'/etc/inkspot/nginx/php.tmpl'
+);
+
+INSERT INTO web_configurations (name, web_engine, description, template) VALUES(
+	'Ruby',
+	(SELECT name FROM web_engines WHERE name = 'Ruby'),
+	'Standard Ruby support for files ending with .rb',
+	'/etc/inkspot/nginx/ruby.tmpl'
+);
 
 COMMIT;

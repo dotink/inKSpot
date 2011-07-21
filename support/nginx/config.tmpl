@@ -1,0 +1,24 @@
+server {
+	listen       80;
+	server_name  %DOMAIN%;
+
+	root         %DOCUMENT_ROOT%;
+
+	gzip         on;
+	gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+	# Deny access to .hidden files, if Apache's document root
+	# concurs with nginx's one
+
+	location ~ /\. {
+		deny  all;
+	}
+
+	%WEB_CONFIGURATIONS%
+
+	location / {
+		index index.html index.htm;
+		try_files $uri $uri/;	
+	}
+
+}
