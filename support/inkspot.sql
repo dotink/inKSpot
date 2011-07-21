@@ -137,7 +137,7 @@ INSERT INTO web_configurations (name, web_engine_id, description, template) VALU
 
 INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
 	'Ruby',
-	(SELECT id FROM web_engines WHERE name = 'ruby',
+	(SELECT id FROM web_engines WHERE name = 'ruby'),
 	'Standard Ruby support for files ending with .rb',
 	'/etc/inkspot/nginx/ruby.tmpl'
 );
