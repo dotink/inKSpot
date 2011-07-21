@@ -125,19 +125,19 @@ GRANT SELECT ON users TO inkspot_ro;
 GRANT SELECT ON groups TO inkspot_ro;
 GRANT SELECT ON user_groups TO inkspot_ro;
 
-INSERT INTO web_engines (name, cgi_path) VALUES('PHP5', '/usr/bin/php5-cgi');
-INSERT INTO web_engines (name, cgi_path) VALUES('Ruby', '/usr/bin/ruby-cgi');
+INSERT INTO web_engines (name, cgi_path) VALUES('php', '/usr/bin/php5-cgi');
+INSERT INTO web_engines (name, cgi_path) VALUES('ruby', '/usr/bin/ruby-cgi');
 
 INSERT INTO web_configurations (name, web_engine, description, template) VALUES(
 	'PHP5',
-	(SELECT name FROM web_engines WHERE name = 'PHP5'),
+	(SELECT id FROM web_engines WHERE name = 'php5'),
 	'Standard PHP support for files ending with .php',
 	'/etc/inkspot/nginx/php.tmpl'
 );
 
 INSERT INTO web_configurations (name, web_engine, description, template) VALUES(
 	'Ruby',
-	(SELECT name FROM web_engines WHERE name = 'Ruby'),
+	(SELECT id FROM web_engines WHERE name = 'ruby'),
 	'Standard Ruby support for files ending with .rb',
 	'/etc/inkspot/nginx/ruby.tmpl'
 );
