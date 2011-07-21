@@ -110,13 +110,13 @@ CREATE TABLE web_configurations (
 );
 
 CREATE TABLE user_web_configurations (
-	user_id interger NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	web_configuration_id integer NOT NULL REFERENCES web_configurations(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (user_id, web_configuration_id)
 );
 
 CREATE TABLE domain_web_configurations (
-	domain_id interger NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	web_configuration_id integer NOT NULL REFERENCES web_configurations(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (user_id, web_configuration_id)
 );
