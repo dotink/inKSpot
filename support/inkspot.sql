@@ -103,7 +103,7 @@ CREATE TABLE web_engines (
 
 CREATE TABLE web_configurations (
 	id serial PRIMARY KEY NOT NULL,
-	web_engine integer NOT NULL REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	web_engine_id integer NOT NULL REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	name varchar(128) NOT NULL UNIQUE,
 	description text NOT NULL,
 	template varchar(512) NOT NULL	
@@ -128,16 +128,16 @@ GRANT SELECT ON user_groups TO inkspot_ro;
 INSERT INTO web_engines (name, cgi_path) VALUES('php', '/usr/bin/php5-cgi');
 INSERT INTO web_engines (name, cgi_path) VALUES('ruby', '/usr/bin/ruby-cgi');
 
-INSERT INTO web_configurations (name, web_engine, description, template) VALUES(
+INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
 	'PHP5',
-	(SELECT id FROM web_engines WHERE name = 'php5'),
+	SELECT id FROM web_engines WHERE name = 'php5',
 	'Standard PHP support for files ending with .php',
 	'/etc/inkspot/nginx/php.tmpl'
 );
 
-INSERT INTO web_configurations (name, web_engine, description, template) VALUES(
+INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
 	'Ruby',
-	(SELECT id FROM web_engines WHERE name = 'ruby'),
+	SELECT id FROM web_engines WHERE name = 'ruby',
 	'Standard Ruby support for files ending with .rb',
 	'/etc/inkspot/nginx/ruby.tmpl'
 );
