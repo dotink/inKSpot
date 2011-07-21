@@ -99,7 +99,7 @@ CREATE TABLE web_engines (
 	id serial PRIMARY KEY NOT NULL,
 	name varchar(16) NOT NULL UNIQUE,
 	cgi_path varchar(512) NOT NULL
-)
+);
 
 CREATE TABLE web_configurations (
 	id serial PRIMARY KEY NOT NULL,
