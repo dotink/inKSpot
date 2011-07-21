@@ -118,7 +118,7 @@ CREATE TABLE user_web_configurations (
 CREATE TABLE domain_web_configurations (
 	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	web_configuration_id integer NOT NULL REFERENCES web_configurations(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	PRIMARY KEY (user_id, web_configuration_id)
+	PRIMARY KEY (domain_id, web_configuration_id)
 );
 
 GRANT SELECT ON users TO inkspot_ro;
