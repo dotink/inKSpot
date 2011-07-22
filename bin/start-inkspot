@@ -1,48 +1,60 @@
 <?php
 
-echo "Spawning FCGI Processes\n";
+	echo "Spawning FCGI Processes\n";
 
-$pid = WebEngine::start('inkspot', 'inkspot', 'inkspot', '/usr/bin/php5-cgi');
+	$command = implode(' ', array(
+		WebEngine::CGI_CMD,
+		'-s /usr/bin/php5-cgi',
+		'-u inkspot',
+		'-g inkspot',
+		'-f /home/inkspot/var/cgi/inkspot'
+	));
 
-if (!$pid) {
-	throw new fEnvironmentException (
-		'Failed to start inKSpot, could not spawn php5-cgi'
-	);
-	exit();
-}
+	sexec($command, $output);
 
-fFile::create('/home/inkspot/.php5-cgi.pid', $pid);
+	$pid = (preg_match('/PID\:(\s+)?(\d+)/', $output, $matches))
+		? intval($matches[2])
+		: NULL; 
 
-foreach (DomainWebConfigurations::build() as $config) {
-	$domain        = $config->createDomain();
-	$engine        = $config->createEngine();
-	$domain_engine = DomainWebEngine::start($domain, $engine);
-	
-	if (!$domain_engine->getPid()) {
-		trigger_error(
-			sprintf(
-				'Failed to start %s engine for domain "%s"',
-				$engine->getName(),
-				$domain->getDomain()
-			),
-			E_USER_WARNING
+	if (!$pid) {
+		throw new fEnvironmentException (
+			'Failed to start inKSpot, could not spawn php5-cgi'
 		);
+		exit();
 	}
-}
 
-foreach (UserWebConfigurations::build() as $config) {
-	$user        = $config->createUser();
-	$engine      = $config->createEngine();
-	$user_engine = UserWebEngine::start($domain, $engine);
+	fFile::create('/home/inkspot/.php5-cgi.pid', $pid);
+
+	foreach (DomainWebConfigurations::build() as $config) {
+		$domain        = $config->createDomain();
+		$engine        = $config->createEngine();
+		$domain_engine = DomainWebEngine::start($domain, $engine);
 	
-	if (!$user_engine->getPid()) {
-		trigger_error(
-			sprintf(
-				'Failed to start %s engine for user "%s"',
-				$engine->getName(),
-				$user->getUsername()
-			),
-			E_USER_WARNING
-		);
+		if (!$domain_engine->getPid()) {
+			trigger_error(
+				sprintf(
+					'Failed to start %s engine for domain "%s"',
+					$engine->getName(),
+					$domain->getDomain()
+				),
+				E_USER_WARNING
+			);
+		}
 	}
-}
+
+	foreach (UserWebConfigurations::build() as $config) {
+		$user        = $config->createUser();
+		$engine      = $config->createEngine();
+		$user_engine = UserWebEngine::start($domain, $engine);
+	
+		if (!$user_engine->getPid()) {
+			trigger_error(
+				sprintf(
+					'Failed to start %s engine for user "%s"',
+					$engine->getName(),
+					$user->getUsername()
+				),
+				E_USER_WARNING
+			);
+		}
+	}
