@@ -2,13 +2,14 @@
 /**
  * Moor is a URL Routing/Linking/Controller library for PHP 5
  *
- * @copyright  Copyright (c) 2010 Jeff Turcotte, others
+ * @copyright  Copyright (c) 2010-2011 Jeff Turcotte, others
  * @author     Jeff Turcotte [jt] <jeff.turcotte@gmail.com>
  * @author     Will Bond [wb] <will@flourishlib.com>
+ * @author     Will Bond, iMarc LLC [wb-imarc] <will@imarc.net>
  * @license    MIT (see LICENSE or bottom of this file)
  * @package    Moor
  * @link       http://github.com/jeffturcotte/moor
- * @version    1.0.0b7
+ * @version    1.0.0b9
  */
 class Moor {
 	/**
@@ -241,7 +242,7 @@ class Moor {
 
 					$dist = levenshtein($callback->finder, $callback_string);
 					$accu = strrpos($callback->finder, '*');
-					$diff = abs(count($route->url->request_params) - count($param_names));
+					$diff = count(array_diff(array_keys($route->url->request_params), $param_names));
 					$sect = count(array_intersect_key(array_flip(array_keys($route->url->request_params)), $param_names_flipped));
 
 					$is_best = (
@@ -249,7 +250,7 @@ class Moor {
 						$low_dist > $dist ||
 						$low_dist == $dist && $top_accu < $accu ||
 						$low_dist == $dist && $top_accu == $accu && $top_sect < $sect ||
-						$low_dist == $dist && $top_accu == $accu && $top_sect <= $sect && $top_diff > $diff
+						$low_dist == $dist && $top_accu == $accu && $top_sect <= $sect && $low_diff > $diff 
 					);
 
 					if ($is_best) {
@@ -257,7 +258,7 @@ class Moor {
 						$low_dist = $dist;
 						$top_accu = $accu;
 						$top_sect = $sect;
-						$top_diff = $diff;
+						$low_diff = $diff;
 					}
 				}
 			}
@@ -321,11 +322,18 @@ class Moor {
 		}
 
 		foreach($excluded_params as $name => $value) {
-			$excluded_params[$name] = urlencode($value);
+			$excluded_params[$name] = $value;
 		}
 
 		if (!empty($excluded_params)) {
+			// Remove any fragment so we can place it fter the query string
+			if (preg_match('/#.*$/', $url, $match)) {
+				$url = substr($url, 0, 0 - strlen($match[0]));
+			}
 			$url .= '?' . http_build_query($excluded_params);
+			if (!empty($match)) {
+				$url .= $match[0];
+			}
 		}
 
 		if (isset(self::$active_proxy_uri)) {
@@ -466,6 +474,16 @@ class Moor {
 	}
 
 	/**
+	 * Gets the callback for when a route is not found.
+	 *
+	 * @return callback  The callback to use for executing the not found functionality
+	 **/
+	public static function getNotFoundCallback()
+	{
+		return self::$not_found_callback;
+	}
+	
+	/**
 	 * Get the path to the supplied callback
 	 *
 	 * @param string $callback
@@ -602,9 +620,12 @@ class Moor {
 		}
 
 		self::$messages[] = 'No Valid Matches Found. Running Not Found callback: ' . self::$not_found_callback;
-
-		call_user_func(self::compat(self::$not_found_callback));
-		exit();
+		
+		$route = (object) 'route';
+		$route->url      = self::parseUrl('*');
+		$route->callback = self::parseCallback(self::$not_found_callback);
+		$route->function = NULL;
+		self::dispatchRoute($route);
 	}
 
 	/**
@@ -1066,8 +1087,12 @@ class Moor {
 
 		$string = str_replace('::', $ds, $callback_string);
 		$string = str_replace('\\', $ds, $string);
-		$string = preg_replace('/_([A-Z])/', $ds.'$1', $string);
-
+		$string = preg_replace(
+			'/_([A-Z])/',
+			str_replace('\\', '\\\\', $ds).'$1',
+			$string
+		);
+		
 		$pieces = explode($ds, $string);
 		foreach($pieces as $n => $piece) {
 			$pieces[$n] = self::underscorize($piece);
@@ -1082,7 +1107,7 @@ class Moor {
 	 * @param  string $callback_string The callback
 	 * @return object The callback object
 	 */
-	private static function &parseCallback($callback_string)
+	private static function parseCallback($callback_string)
 	{
 		$callback = (object) trim($callback_string, '\\');
 
@@ -1137,25 +1162,30 @@ class Moor {
 	 * @param  string $url_string    The URL string (either shorthand or a regular expression)
 	 * @return object The URL object
 	 */
-	private static function &parseUrl($url_string)
+	private static function parseUrl($url_string)
 	{
 		$url = (object) $url_string;
 		$url->shorthand = trim($url_string);
-		$url->pattern   = $url->shorthand;
-
+		$url->pattern   = str_replace('#', '\\#', $url->shorthand);
+		
 		// determine whether we should match from beginning
 		// to end of the url, or one or the other, or not at all
 
 		$match_start = TRUE;
 		$match_end   = TRUE;
-
-		if (isset($url->scalar[0]) && $url->scalar[0] == '*') {
-			$match_start = FALSE;
-			$url->shorthand = substr($url->shorthand, 1);
-		}
-		if ($url->scalar[strlen($url->scalar)-1] == '*') {
-			$match_end = FALSE;
-			$url->shorthand = substr($url->shorthand, 0, -1);
+		
+		if ($url->scalar == '*') {
+			$url->pattern   = '.*';
+			$url->shorthand = '';
+		} else {
+			if (isset($url->scalar[0]) && $url->scalar[0] == '*') {
+				$match_start = FALSE;
+				$url->shorthand = substr($url->shorthand, 1);
+			}
+			if ($url->scalar[strlen($url->scalar)-1] == '*') {
+				$match_end = FALSE;
+				$url->shorthand = substr($url->shorthand, 0, -1);
+			}
 		}
 
 		// parse out callback params with formatting rules
@@ -1310,15 +1340,25 @@ class MoorProgrammerException extends MoorException {}
 class MoorContinueException extends MoorException {}
 class MoorNotFoundException extends MoorException {}
 
+// ============
+// = Includes =
+// ============
+
+if (!class_exists('MoorAbtractController', FALSE)) {
+	require 'MoorAbstractController.php';
+}
+if (!class_exists('MoorActionController', FALSE)) {
+	require 'MoorActionController.php';
+}
 
 // ===========
 // = License =
 // ===========
 
 // Moor - a routing, linking and controller library for PHP5
-//
-// Copyright (c) 2010 Jeff Turcotte, others
-//
+// 
+// Copyright (c) 2010-2011 Jeff Turcotte, others
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -1339,3 +1379,4 @@ class MoorNotFoundException extends MoorException {}
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
+
