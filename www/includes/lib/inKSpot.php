@@ -1,6 +1,6 @@
 <?php
 
-	class inKSpot {
+	class inKSpot implements inkwell {
 	
 		const EXTERNAL_DOMAIN = 'inkspot';
 		
@@ -22,7 +22,8 @@
 		 * @param string $element The name of the configuration element
 		 * @return boolean TRUE if configuration was successful, FALSE otherwise
 		 */
-		static public function __init($config, $element) {
+		static public function __init(Array $config, $element)
+		{
 			self::$external_domain = isset($config['external_domain'])
 				? $config['external_domain']
 				: self::EXTERNAL_DOMAIN;
