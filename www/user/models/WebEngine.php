@@ -9,6 +9,8 @@
 	 */
 	class WebEngine extends ActiveRecord
 	{
+	
+		CGI_CMD = 'spawn-fcgi';
 
 		/**
 		 * Initializes all static class information for the WebEngine model
@@ -146,13 +148,14 @@
 		 */
 		static public function start(Engine $engine, User $user, Group $group, $socket) {
 			$command = implode(' ', array(
-				CGI_CMD,
+				self::CGI_CMD,
 				'-s ' . CGI_ROOT . $socket . '.' . $engine->getName(),
 				'-u ' . $user->getUsername(),
 				'-g ' . $group->getGroupname(),
 				'-f ' . $engine->getCgiPath()
 			));
-			$output  = `$command`;
+			
+			sexec($command, $output);
 
 			return (preg_match('/PID\:(\s+)?(\d+)/', $output, $matches))
 				? intval($matches[2])

@@ -169,7 +169,7 @@
 					$engine,
 					$user,
 					$user->createGroup(),
-					CGI_ROOT . DIRECTORY_SEPARATOR . $user->getUsername()
+					self::CGI_ROOT . DIRECTORY_SEPARATOR . $user->getUsername()
 				);
 				
 				$self->setPid($pid);
