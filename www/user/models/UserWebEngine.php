@@ -178,5 +178,49 @@
 			
 			return $self;
 		}
+		
+		/**
+		 * Stops a user web engine.  If the web engine is already stopped for
+		 * the provided user the function exits gracefully if not it will be
+		 * stopped and the record removed.
+		 *
+		 * @static
+		 * @access public
+		 * @param User $user The user to start the engine for
+		 * @param Engine $engine The engine to start
+		 * @return boolean TRUE if the engine was/is stopped, FALSE otherwise
+		 */
+		static public function stop(User $user, Engine $engine)
+		{
+			try {
+				$self = new self(array(
+					'user_id'   => $user->getId(),
+					'engine_id' => $engine->getId()
+				));
+			} catch (fNotFoundException $e) {
+				return TRUE;
+			}
 
+			if ($self->getPid()) {
+
+				$kill_commands = array(
+					'kill '    . $self->getPid(),
+					'kill -9 ' . $self->getPid()
+				);
+
+				$check_command = 'ps -A | grep ' . $self->getPid();
+
+				foreach ($kill_commands as $command) {
+					sexec($command, $output, $failure);
+					if ($failure || $check_command) {
+						sleep(5);
+					} else {
+						$self->delete();
+						return TRUE;
+					}
+				}
+			}
+			
+			return FALSE;
+		}
 	}

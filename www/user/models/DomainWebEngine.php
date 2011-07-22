@@ -179,4 +179,49 @@
 			return $self;
 		}
 
+		/**
+		 * Stops a domain web engine.  If the web engine is already stopped for
+		 * the provided domain the function exits gracefully if not it will be
+		 * stopped and the record removed.
+		 *
+		 * @static
+		 * @access public
+		 * @param Domain $domain The domain to start the engine for
+		 * @param Engine $engine The engine to start
+		 * @return boolean TRUE if the engine was/is stopped, FALSE otherwise
+		 */
+		static public function stop(Domain $domain, Engine $engine)
+		{
+			try {
+				$self = new self(array(
+					'domain_id' => $domain->getId(),
+					'engine_id' => $engine->getId()
+				));
+			} catch (fNotFoundException $e) {
+				return TRUE;
+			}
+
+			if ($self->getPid()) {
+
+				$kill_commands = array(
+					'kill '    . $self->getPid(),
+					'kill -9 ' . $self->getPid()
+				);
+
+				$check_command = 'ps -A | grep ' . $self->getPid();
+
+				foreach ($kill_commands as $command) {
+					sexec($command, $output, $failure);
+					if ($failure || $check_command) {
+						sleep(5);
+					} else {
+						$self->delete();
+						return TRUE;
+					}
+				}
+			}
+			
+			return FALSE;
+		}
+
 	}
