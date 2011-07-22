@@ -21,7 +21,6 @@ CREATE TABLE users (
 
 CREATE TABLE user_shadows (
 	username varchar(32) NOT NULL PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE,
-	email_address varchar(256) NOT NULL,
 	login_password varchar(512) DEFAULT NULL,
 	last_change_days int NOT NULL DEFAULT CURRENT_DATE - DATE '1970-01-01',
 	min_change_days int NOT NULL DEFAULT '0',
