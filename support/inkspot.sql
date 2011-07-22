@@ -4,9 +4,9 @@ CREATE SEQUENCE group_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 CREATE SEQUENCE user_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 
 CREATE TABLE activation_requests (
-	email_address varchar(256) NOT NULL PRIMARY KEY,
-	key varchar(256) NOT NULL,
-	name varchar(64) NOT NULL
+	key varchar(256) NOT NULL PRIMARY KEY,
+	name varchar(64) NOT NULL,
+	email_address varchar(256) NOT NULL
 );
 
 CREATE TABLE groups (
