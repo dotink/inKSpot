@@ -7,23 +7,18 @@
 		'-s /usr/bin/php5-cgi',
 		'-u inkspot',
 		'-g inkspot',
-		'-f /home/inkspot/var/cgi/inkspot'
+		'-f ' . WebEngine::SOCK_ROOT . DIRECTORY_SEPARATOR . 'inkspot',
+		'-p  /home/inkspot/.php5-cgi.pid'
 	));
 
-	sexec($command, $output);
+	sexec($command, $output, $failure);
 
-	$pid = (preg_match('/PID\:(\s+)?(\d+)/', $output, $matches))
-		? intval($matches[2])
-		: NULL; 
-
-	if (!$pid) {
+	if ($failure) {
 		throw new fEnvironmentException (
 			'Failed to start inKSpot, could not spawn php5-cgi'
 		);
 		exit();
 	}
-
-	fFile::create('/home/inkspot/.php5-cgi.pid', $pid);
 
 	foreach (DomainWebConfigurations::build() as $config) {
 		$domain        = $config->createDomain();
