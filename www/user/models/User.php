@@ -269,8 +269,14 @@
 				$hosts = new fFile('/etc/hosts');
 				$hosts->append(implode(' ', array(
 					'127.0.2.1',
-					$user->getDomain() . "\n"
+					$user->getDomain(),
+					$user->getUsername() . "\n"
 				)));
+				
+				inKSpot::writeWebConfig(
+					$user->buildWebConfiguration(),
+					$user->getUsername()
+				);
 
 				self::$building = FALSE;
 
@@ -321,7 +327,11 @@
 		{
 			$sub_config  = '';
 			$username    = $this->getUsername();
-			$userwww     = $this->getHome() . 'www/local/' . $username;
+			$userwww     = implode(DIRECTORY_SEPARATOR, array(
+				$this->getHome() . 'www/local', // localwww
+				$username,                      // userwww
+				'docroot'                       // docroot
+			));
 			$domain      = $this->getDomain();
 
 			$web_configs =	UserWebConfigurations::build(
