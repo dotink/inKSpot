@@ -144,7 +144,7 @@
 		 * @param Engine $engine The Engine to start
 		 * @param User $user The user to start the engine for
 		 * @param Group $group The group to start the engine for
-		 * @param string $socket The socket location, relative to CGI_ROOT
+		 * @param string $socket The absolute socket location
 		 * @return integer The PID of the newly started engine
 		 */
 		static public function start(Engine $engine, User $user, Group $group, $socket) {
