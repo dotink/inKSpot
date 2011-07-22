@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+
+	$valid_commands = array(
+		'chown', 'chgrp', 'chmod', 'kill', 'spawn-fcgi', 'nginx'
+	);
+
+	$command = $argv[1];
+
+	if (!in_array($command, $valid_commands) || `which $command` !== $argv[1]) {
+		echo "Invalid Command";
+		return 1;
+	}
+
+	$command    = $argv;
+	$command[0] = NULL;
+	$command    = implode(' ', $command);
+
+	exec($command, $output, $failure);
+	foreach ($output as $line) {
+		echo $line;
+	}
+	return $failure;

@@ -103,19 +103,9 @@ echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
 rpl "umask 022" "umask 007" /etc/profile
 umask 007
 
-echo "Giving inkspot some binaries..."
-mkdir /home/inkspot/sbin
-chown inkspot:inkspot /home/inkspot/sbin
-chmod -R 770 /home/inkspot/sbin
-REQUIRED_SUID_BINARIES=(chown chgrp chmod kill spawn-fcgi nginx)
-for i in ${REQUIRED_SUID_BINARIES[*]}; do
-	BIN_LOCATION=`which $i`
-	if [ $BIN_LOCATION ]; then
-		cp $BIN_LOCATION /home/inkspot/sbin
-	fi
-done
-chown -R root:inkspot /home/inkspot/sbin
-chmod 4750 /home/inkspot/sbin/*
+echo "Giving inkspot suexec ability..." 
+chown root:inkspot /home/inkspot/bin/suexec
+chmod 4750 /home/inkspot/bin/suexec
 
 echo "Reconfiguring postgres authentication..."
 for ver_dir in `ls -1 /etc/postgresql`; do
