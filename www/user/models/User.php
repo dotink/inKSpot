@@ -312,8 +312,12 @@
 
 		/**
 		 * Builds a user's web hosting configuration file
+		 *
+		 * @access public
+		 * @param void
+		 * @return string The configuration content
 		 */
-		public function buildWWWConfig()
+		public function buildWebConfiguration()
 		{
 			$sub_config  = '';
 			$username    = $this->getUsername();
@@ -352,8 +356,7 @@
 				'%DOCUMENT_ROOT%'      => 'userwww',				
 			);
 
-			$config = new fFile(WebConfiguration::STANDARD_TMPL);
-			$config = $config->read();
+			$config = WebConfiguration::getStandardConfiguration();
 
 			foreach ($template_vars as $var => $value) {
 				$config = str_replace(

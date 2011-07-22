@@ -10,6 +10,8 @@
 	class WebConfiguration extends ActiveRecord
 	{
 
+		const STANDARD_CONFIGURATION = '/etc/inkspot/nginx/config.tmpl';
+
 		/**
 		 * Initializes all static class information for the WebConfiguration model
 		 *
@@ -131,6 +133,21 @@
 		static public function createFromResourceKey($resource_key)
 		{
 			return parent::createFromResourceKey(__CLASS__, $resource_key);
+		}
+
+		/**
+		 * Gets the content of the standard configuration file located
+		 * by WebConfiguration::STANDARD_CONFIGURATION
+		 *
+		 * @static
+		 * @access public
+		 * @param void
+		 * @return string The content of the standard configuration
+		 */
+		static public function getStandardConfiguration()
+		{
+			$config = new fFile(self::STANDARD_CONFIGURATION);
+			return $config->read();
 		}
 
 	}
