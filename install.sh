@@ -85,9 +85,10 @@ chmod 770 /etc/nginx/sites-enabled
 chmod 770 /etc/nginx/sites-available
 
 ##
-# Give inkspot a configuration home
+# Give inkspot a configuration home and copy defaults
 ##
 mkdir /etc/inkspot
+cp -R etc/inkspot/* /etc/inkspot
 chown inkspot:inkspot /etc/inkspot
 
 echo "Updating umask..."
