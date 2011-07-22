@@ -107,7 +107,7 @@ echo "Giving inkspot some binaries..."
 mkdir /home/inkspot/sbin
 chown inkspot:inkspot /home/inkspot/sbin
 chmod -R 770 /home/inkspot/sbin
-REQUIRED_SUID_BINARIES=(chown chgrp chmod kill spawn-fcgi)
+REQUIRED_SUID_BINARIES=(chown chgrp chmod kill spawn-fcgi nginx)
 for i in ${REQUIRED_SUID_BINARIES[*]}; do
 	BIN_LOCATION=`which $i`
 	if [ $BIN_LOCATION ]; then
