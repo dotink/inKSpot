@@ -10,7 +10,7 @@
 	class UserWebEngine extends ActiveRecord
 	{
 
-		const CGI_ROOT = 'users';
+		const SOCK_ROOT = 'users';
 
 		/**
 		 * Initializes all static class information for the UserWebEngine model
@@ -134,6 +134,24 @@
 		{
 			return parent::createFromResourceKey(__CLASS__, $resource_key);
 		}
+		
+		/**
+		 * Gets the socket location for a user web engine
+		 *
+		 * @static
+		 * @access public
+		 * @param User $user The user to get the socket for
+		 * @param Engine $engine The engine to get the socket for
+		 * @return string The absolute socket path
+		 */
+		static public function getSocket(User $user, Engine $engine)
+		{
+			return implode(DIRECTORY_SEPARATOR, array(
+				parent::SOCK_ROOT,
+				self::SOCK_ROOT,
+				$user->getUsername() . '.' . $engine->getName()
+			));
+		}
 
 		/**
 		 * Attempts to start a user web engine.  If the web engine is already
@@ -169,7 +187,7 @@
 					$engine,
 					$user,
 					$user->createGroup(),
-					self::CGI_ROOT . DIRECTORY_SEPARATOR . $user->getUsername()
+					self::getSocket($user, $engine)
 				);
 				
 				$self->setPid($pid);

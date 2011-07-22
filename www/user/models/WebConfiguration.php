@@ -1,20 +1,17 @@
 <?php
 
 	/**
-	 * The WebEngine is an active record and model representing a single
-	 * Web Engine record.
+	 * The WebConfiguration is an active record and model representing a single
+	 * Web Configuration record.
 	 *
 	 * @author Matthew J. Sahagian [mjs] <gent@dotink.org>
 	 * @copyright Copyright (c) 2011, Matthew J. Sahagian
 	 */
-	class WebEngine extends ActiveRecord
+	class WebConfiguration extends ActiveRecord
 	{
-	
-		const CGI_CMD   = 'spawn-fcgi';
-		const SOCK_ROOT = '/home/inkspot/var/cgi';
 
 		/**
-		 * Initializes all static class information for the WebEngine model
+		 * Initializes all static class information for the WebConfiguration model
 		 *
 		 * @static
 		 * @access public
@@ -28,7 +25,7 @@
 		}
 
 		/**
-		 * Gets the record name for the WebEngine class
+		 * Gets the record name for the WebConfiguration class
 		 *
 		 * @static
 		 * @access public
@@ -41,7 +38,7 @@
 		}
 
 		/**
-		 * Gets the record table name for the WebEngine class
+		 * Gets the record table name for the WebConfiguration class
 		 *
 		 * @static
 		 * @access public
@@ -54,7 +51,7 @@
 		}
 
 		/**
-		 * Gets the record set name for the WebEngine class
+		 * Gets the record set name for the WebConfiguration class
 		 *
 		 * @static
 		 * @access public
@@ -67,7 +64,7 @@
 		}
 
 		/**
-		 * Gets the entry name for the WebEngine class
+		 * Gets the entry name for the WebConfiguration class
 		 *
 		 * @static
 		 * @access public
@@ -80,7 +77,7 @@
 		}
 
 		/**
-		 * Gets the order for the WebEngine class
+		 * Gets the order for the WebConfiguration class
 		 *
 		 * @static
 		 * @access public
@@ -107,7 +104,7 @@
 		}
 
 		/**
-		 * Creates a new WebEngine from a slug and identifier.  The
+		 * Creates a new WebConfiguration from a slug and identifier.  The
 		 * identifier is optional, but if is provided acts as an additional
 		 * check against the validity of the record.
 		 *
@@ -123,7 +120,7 @@
 		}
 
 		/**
-		 * Creates a new WebEngine from a provided resource key.
+		 * Creates a new WebConfiguration from a provided resource key.
 		 *
 		 * @static
 		 * @access public
@@ -134,33 +131,6 @@
 		static public function createFromResourceKey($resource_key)
 		{
 			return parent::createFromResourceKey(__CLASS__, $resource_key);
-		}
-
-		/**
-		 * Starts a new web engine (CGI process)
-		 *
-		 * @static
-		 * @access public
-		 * @param Engine $engine The Engine to start
-		 * @param User $user The user to start the engine for
-		 * @param Group $group The group to start the engine for
-		 * @param string $socket The socket location, relative to CGI_ROOT
-		 * @return integer The PID of the newly started engine
-		 */
-		static public function start(Engine $engine, User $user, Group $group, $socket) {
-			$command = implode(' ', array(
-				self::CGI_CMD,
-				'-s ' . $socket,
-				'-u ' . $user->getUsername(),
-				'-g ' . $group->getGroupname(),
-				'-f ' . $engine->getCgiPath()
-			));
-			
-			sexec($command, $output);
-
-			return (preg_match('/PID\:(\s+)?(\d+)/', $output, $matches))
-				? intval($matches[2])
-				: NULL; 
 		}
 
 	}

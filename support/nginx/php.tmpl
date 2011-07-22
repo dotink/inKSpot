@@ -4,7 +4,7 @@ location / {
 }
 
 location ~ \.php {
-	fastcgi_pass         unix:/home/inkspot/var/cgi/%CONTEXT%/%NAME%.%ENGINE%;
+	fastcgi_pass         unix:%SOCKET%;
 	fastcgi_index        index.php;
 	fastcgi_read_timeout 500;
 

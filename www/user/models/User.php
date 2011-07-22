@@ -9,7 +9,7 @@
 	 */
 	class User extends ActiveRecord
 	{
-	
+
 		/**
 		 * @var boolean
 		 * @static
@@ -199,12 +199,12 @@
 						'Could not build home directory for user %s',
 						$username
 					);
-				} 
+				}
 
 				try {
 					$group = new Group();
 					$group->setGroupname($values['username']);
-					$group->store();	
+					$group->store();
 				} catch (fException $e) {
 					fFilesystem::rollback();
 					throw new fEnvironmentException (
@@ -256,7 +256,7 @@
 				// Make the user's www have their group and change
 				// to g+s so all files and dirs created within it also
 				// have that group
-								
+
 				$userwww = $home . 'www/local/' . $username;
 
 				sexec('chgrp -R  ' . $username . ' ' . $userwww);
@@ -269,14 +269,26 @@
 				$hosts = new fFile('/etc/hosts');
 				$hosts->append(implode(' ', array(
 					'127.0.2.1',
-					$username . '.' . inKSpot::getExternalDomain() . "\n"
+					$user->getDomain() . "\n"
 				)));
 
 				self::$building = FALSE;
 
 			}
 		}
-		
+
+		/**
+		 * Gets the domain for the user account
+		 *
+		 * @access public
+		 * @param void
+		 * @return string The current user subdomain
+		 */
+		public function getDomain()
+		{
+			return $this->getUsername() . '.' . inKSpot::getExternalDomain();
+		}
+
 		/**
 		 * Attempts to create a user from a somewhat ambiguous parameter
 		 *
@@ -294,10 +306,66 @@
 					$user = new User(array('username' => $user));
 				}
 			}
-			
+
 			return $user;
 		}
-		
+
+		/**
+		 * Builds a user's web hosting configuration file
+		 */
+		public function buildWWWConfig()
+		{
+			$sub_config  = '';
+			$username    = $this->getUsername();
+			$userwww     = $this->getHome() . 'www/local/' . $username;
+
+			$web_configs =	UserWebConfigurations::build(
+				array(
+					'user_id' => $this->getId()
+				)
+			);	
+
+			foreach ($web_configs as $web_config) {
+
+				$template_vars = array(
+					'%SOCKET%' => 'socket'
+				);
+
+				$config = $web_conf->getTemplate()->read();
+				$engine = $web_conf->createEngine();
+				$socket = UserWebEngine::getSocket($this, $engine);
+				
+				foreach ($template_vars as $var => $value) {
+					$config = str_replace(
+						$var,
+						$$value,
+						$config
+					);
+				}
+
+				$sub_config .= "\n\n" . $config;
+			}
+
+			$template_vars = array(
+				'%SUB_CONFIGURATIONS%' => 'sub_config',
+				'%DOMAIN%'             => 'domain',
+				'%DOCUMENT_ROOT%'      => 'userwww',				
+			);
+
+			$config = new fFile(WebConfiguration::STANDARD_TMPL);
+			$config = $config->read();
+
+			foreach ($template_vars as $var => $value) {
+				$config = str_replace(
+					$var,
+					$$value,
+					$config
+				);
+			}
+			
+			return $config;
+		}
+
 		/**
 		 * Adds trust between the user and another user
 		 *
@@ -314,7 +382,7 @@
 				$user->getId(),
 				$this->createGroup()->getId()
 			);
-			
+
 			$src_user = $this->getUsername();
 			$dst_user = $user->getUsername();
 			$src      = '/home/users/' . $src_user . '/www/local/' . $src_user;
@@ -344,7 +412,7 @@
 			$src_user = $this->getUsername();
 			$dst_user = $user->getUsername();
 			$dst      = '/home/users/' . $dst_user . '/www/local/' . $src_user;
-			
+
 			exec('rm ' . $dst);
 		}
 
@@ -352,16 +420,16 @@
 		 * Checks whether or not a user is trusted by the user
 		 * @access public
 		 * @param int|string|User The User, user id, or username to trust
-		 * @return boolean Whether or not the user is trusted	 
+		 * @return boolean Whether or not the user is trusted
 		 */
 		public function checkTrust($user)
 		{
 			$user = self::create($user);
-			
+
 			return fORMDatabase::retrieve(__CLASS__)->query(
 				'SELECT * FROM user_groups WHERE user_id=%i AND group_id=%i',
 				$user->getId(),
 				$this->createGroup()->getId()
-			)->countReturnedRows();		
+			)->countReturnedRows();
 		}
 	}

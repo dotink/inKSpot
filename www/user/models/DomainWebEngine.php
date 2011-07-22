@@ -10,7 +10,7 @@
 	class DomainWebEngine extends ActiveRecord
 	{
 
-		const CGI_ROOT = 'domains';
+		const SOCK_ROOT = 'domains';
 
 		/**
 		 * Initializes all static class information for the DomainWebEngine model
@@ -136,6 +136,24 @@
 		}
 		
 		/**
+		 * Gets the socket location for a domain web engine
+		 *
+		 * @static
+		 * @access public
+		 * @param Domain $domain The domain to get the socket for
+		 * @param Engine $engine The engine to get the socket for
+		 * @return string The absolute socket path
+		 */
+		static public function getSocket(Domain $domain, Engine $engine)
+		{
+			return implode(DIRECTORY_SEPARATOR, array(
+				parent::SOCK_ROOT,
+				self::SOCK_ROOT,
+				$domain->getDomain() . '.' . $engine->getName()
+			));
+		}
+
+		/**
 		 * Attempts to start a domain web engine.  If the web engine is already
 		 * started for the provided domain, the function fails gracefully, if
 		 * not it will be started and the PID updated.
@@ -169,7 +187,7 @@
 					$engine,
 					$domain->createUser(),
 					$domain->createGroup(),
-					self::CGI_ROOT . DIRECTORY_SEPARATOR . $domain->getDomain()
+					self::getSocket($domain, $engine)
 				);		
 				
 				$self->setPid($pid);
