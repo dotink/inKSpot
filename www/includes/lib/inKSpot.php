@@ -3,6 +3,7 @@
 	class inKSpot implements inkwell {
 	
 		const EXTERNAL_DOMAIN = 'inkspot';
+		const WEB_CONFIGS_DIR = '/home/inkspot/nginx';
 		
 		/**
 		 * @static
@@ -42,5 +43,16 @@
 		static public function getExternalDomain()
 		{
 			return self::$external_domain;
+		}
+		
+		/**
+		 *
+		 */
+		static public function writeWebConfig($config, $location)
+		{
+			return fFile::create($config, implode(DIRECTORY_SEPARATOR, array(
+				self::WEB_CONFIGS_DIR,
+				$location
+			)));
 		}
 	}
