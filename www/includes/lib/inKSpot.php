@@ -48,11 +48,11 @@
 		/**
 		 *
 		 */
-		static public function writeWebConfig($config, $location)
+		static public function writeWebConfig($config, $name)
 		{
-			return fFile::create($config, implode(DIRECTORY_SEPARATOR, array(
+			return fFile::create(implode(DIRECTORY_SEPARATOR, array(
 				self::WEB_CONFIGS_DIR,
-				$location
-			)));
+				$name
+			)), $config);
 		}
 	}
