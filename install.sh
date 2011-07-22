@@ -77,6 +77,13 @@ chown -R inkspot:inkspot /home/inkspot/lib
 chmod -R 770 /home/inkspot/lib
 
 ##
+# Create our NGINX directory
+##
+mkdir /home/inkspot/nginx
+chown -R inkspot:inkspot /home/inkspot/nginx
+chmod -R 770 /home/inkspot/nginx
+
+##
 # Allow www-data to write to nginx configs
 ##
 chgrp www-data /etc/nginx/sites-available
