@@ -3,6 +3,12 @@ BEGIN;
 CREATE SEQUENCE group_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 CREATE SEQUENCE user_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 
+CREATE TABLE activation_requests (
+	email_address varchar(256) NOT NULL PRIMARY KEY,
+	key varchar(256) NOT NULL,
+	name varchar(64) NOT NULL
+);
+
 CREATE TABLE groups (
 	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('group_id'),
 	groupname varchar(64) NOT NULL,
@@ -21,6 +27,7 @@ CREATE TABLE users (
 
 CREATE TABLE user_shadows (
 	username varchar(32) NOT NULL PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	email_address varchar(256) NOT NULL UNIQUE,
 	login_password varchar(512) DEFAULT NULL,
 	last_change_days int NOT NULL DEFAULT CURRENT_DATE - DATE '1970-01-01',
 	min_change_days int NOT NULL DEFAULT '0',

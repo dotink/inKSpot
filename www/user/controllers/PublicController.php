@@ -21,6 +21,8 @@
 			parent::prepare();
 
 			$this -> view
+				  -> add  ('styles', '/styles/inkling.css')
+				  -> add  ('styles', '/styles/main.css')
 				  -> add  ('styles', '/styles/public/main.css')
 				  -> add  ('header', 'public/header.php')
 				  -> pack ('id',     self::getAction());
@@ -60,13 +62,46 @@
 		/**
 		 * The signup page
 		 */
-		static public function signup($email = NULL)
+		static public function signup($email = NULL, $key = NULL)
 		{
-			if (fRequest::isPost() || $email) {
-				$email = fRequest::get('email_address', 'string', $email);
+			$self = new self();
+
+			if (fRequest::isPost()) {
+
+				$email_address  = fRequest::get('email_address');
+				$user_full_name = fRequest::get('name');
+				$activation_key = sha1($email_address . microtime());
+				
+				try {
+					$activation_request = new ActivationRequest($email_address);
+				} catch (fNotFoundException $e) {
+					$activation_request = new ActivationRequest();
+					$activation_request->setEmailAddress($email_address);
+				}
+
+				$activation_request->setKey($activation_key);
+				$activation_request->store();
+
+				$self -> view
+					  -> pack ('email_address', $email_address)
+					  -> pack ('name',          $user_full_name);
+
+				$email = new fEmail();
+				$email->setFromAddress('noreply@' . fURL::getDomain());
+				$email->addRecipient($email, $user_full_name);
+				$email->setSubjct('Create your inKSpot account!');
+				
+				$body  = new View();
+				$body -> load ('emails/signup.php')
+					  -> pack ('name', $user_full_name)
+					  -> pack ('path', self::linkTo('*::signup', array(
+					  	':key' => $activation_key
+					  )));
+
+				$email->setBody($body->render(TRUE))->send();
 			}
 
-			$self =  new self();
+
 			$self -> view
 				  -> add   ('contents', 'public/signup.php')
 				  -> render();

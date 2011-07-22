@@ -1,0 +1,21 @@
+
+html {
+	background-color: #efefef;
+	font-family: sans;
+}
+
+body {
+	width: 960px;
+	margin: 0 auto;
+	background-color: #fff;
+	border-right: solid 1px #ccc;
+	border-left: solid 1px #ccc;
+	padding: 20px;
+}
+
+h1 {
+	font-size: 6.4em;
+	color: #234567;
+	font-weight: bold;
+}
+
