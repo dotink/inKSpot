@@ -325,7 +325,7 @@
 
 			$web_configs =	UserWebConfigurations::build(
 				array(
-					'user_id' => $this->getId()
+					'user_id=' => $this->getId()
 				)
 			);	
 
