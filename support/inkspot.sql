@@ -60,6 +60,7 @@ CREATE TABLE user_public_keys (
 CREATE TABLE domains (
 	id serial PRIMARY KEY,
 	domain varchar(256) NOT NULL UNIQUE,
+	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	description varchar(256) NOT NULL,
 	alias_for varchar(256) REFERENCES domains(domain) ON DELETE CASCADE ON UPDATE CASCADE,
 	owner integer NOT NULL REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -99,6 +100,20 @@ CREATE TABLE web_engines (
 	id serial PRIMARY KEY NOT NULL,
 	name varchar(16) NOT NULL UNIQUE,
 	cgi_path varchar(512) NOT NULL
+);
+
+CREATE TABLE user_web_engines (
+	web_engine_id integer NOT NULL  REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	pid integer DEFAULT NULL,
+	PRIMARY KEY (web_engine_id, user_id)
+);
+
+CREATE TABLE domain_web_engines (
+	web_engine_id integer NOT NULL  REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	pid integer DEFAULT NULL,
+	PRIMARY KEY (web_engine_id, domain_id)
 );
 
 CREATE TABLE web_configurations (

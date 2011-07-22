@@ -1,36 +1,48 @@
 <?php
 
-define('CGI_CMD',        '/usr/bin/spawn-fcgi');
-define('PHP_CGI',        '/usr/bin/php5-cgi');
-
 echo "Spawning FCGI Processes\n";
-$cmd = implode(' ', array(
-	CGI_CMD,
-	'-s /home/inkspot/var/cgi/inkspot',
-	'-u inkspot',
-	'-g inkspot',
-	'-f ' . PHP_CGI
-));
-echo `$cmd`;
 
-foreach (Domains::build() as $domain) {
-	$cmd = implode(' ', array(
-		CGI_CMD,
-		'-s /home/inkspot/var/cgi/domains/' . $domain->getDomain() . '.php',
-		'-u ' . $domain->createUser()->getUsername(),
-		'-g ' . $domain->getDomain(),
-		'-f ' . PHP_CGI
-	));
-	echo `$cmd`;
+$pid = WebEngine::start('inkspot', 'inkspot', 'inkspot', '/usr/bin/php5-cgi');
+
+if (!$pid) {
+	throw new fEnvironmentException (
+		'Failed to start inKSpot, could not spawn php5-cgi'
+	);
+	exit();
 }
 
-foreach (Users::build() as $user) {
-	$cmd = implode(' ', array(
-		CGI_CMD,
-		'-s /home/inkspot/var/cgi/users/' . $user->getUsername() . '.php',
-		'-u ' . $user->getUsername(),
-		'-g ' . $user->getUsername(),
-		'-f ' . PHP_CGI		
-	));
-	echo `$cmd`;
+fFile::create('/home/inkspot/.php5-cgi.pid', $pid);
+
+foreach (DomainWebConfigurations::build() as $config) {
+	$domain        = $config->createDomain();
+	$engine        = $config->createEngine();
+	$domain_engine = DomainWebEngine::start($domain, $engine);
+	
+	if (!$domain_engine->getPid()) {
+		trigger_error(
+			sprintf(
+				'Failed to start %s engine for domain "%s"',
+				$engine->getName(),
+				$domain->getDomain()
+			),
+			E_USER_WARNING
+		);
+	}
+}
+
+foreach (UserWebConfigurations::build() as $config) {
+	$user        = $config->createUser();
+	$engine      = $config->createEngine();
+	$user_engine = UserWebEngine::start($domain, $engine);
+	
+	if (!$user_engine->getPid()) {
+		trigger_error(
+			sprintf(
+				'Failed to start %s engine for user "%s"',
+				$engine->getName(),
+				$user->getUsername()
+			),
+			E_USER_WARNING
+		);
+	}
 }
