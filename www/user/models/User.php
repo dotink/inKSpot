@@ -266,6 +266,12 @@
 				sexec('chmod a+x ' . $home . 'www/local');
 				sexec('chmod a+x ' . $userwww);
 
+				$hosts = new fFile('/etc/hosts');
+				$hosts->append(implode(' ', 
+					'127.0.2.1',
+					$username . '.' . inKSpot::getExternalDomain()
+				));
+
 				self::$building = FALSE;
 
 			}
