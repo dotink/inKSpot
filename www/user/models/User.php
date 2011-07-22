@@ -278,18 +278,6 @@
 		}
 
 		/**
-		 * Gets the domain for the user account
-		 *
-		 * @access public
-		 * @param void
-		 * @return string The current user subdomain
-		 */
-		public function getDomain()
-		{
-			return $this->getUsername() . '.' . inKSpot::getExternalDomain();
-		}
-
-		/**
 		 * Attempts to create a user from a somewhat ambiguous parameter
 		 *
 		 * @static
@@ -311,6 +299,18 @@
 		}
 
 		/**
+		 * Gets the domain for the user account
+		 *
+		 * @access public
+		 * @param void
+		 * @return string The current user subdomain
+		 */
+		public function getDomain()
+		{
+			return $this->getUsername() . '.' . inKSpot::getExternalDomain();
+		}
+
+		/**
 		 * Builds a user's web hosting configuration file
 		 *
 		 * @access public
@@ -322,6 +322,7 @@
 			$sub_config  = '';
 			$username    = $this->getUsername();
 			$userwww     = $this->getHome() . 'www/local/' . $username;
+			$domain      = $this->getDomain();
 
 			$web_configs =	UserWebConfigurations::build(
 				array(
