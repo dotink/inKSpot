@@ -60,9 +60,21 @@
 		}
 
 		/**
+		 *
+		 */
+		static private function activate($key)
+		{
+
+			$self -> view
+				  -> add   ('contents', 'public/activate.php')
+				  -> render();
+		
+		}
+
+		/**
 		 * The signup page
 		 */
-		static public function signup($email = NULL, $key = NULL)
+		static public function signup()
 		{
 			$self = new self();
 
@@ -71,6 +83,7 @@
 				$email_address  = fRequest::get('email_address');
 				$user_full_name = fRequest::get('name');
 				$activation_key = sha1($email_address . microtime());
+				$system_domain  = inKSpot::getExternalDomain();
 				
 				try {
 					$activation_request = new ActivationRequest($email_address);
@@ -79,6 +92,7 @@
 					$activation_request->setEmailAddress($email_address);
 				}
 
+				$activation_request->setName($user_full_name);
 				$activation_request->setKey($activation_key);
 				$activation_request->store();
 
@@ -87,20 +101,35 @@
 					  -> pack ('name',          $user_full_name);
 
 				$email = new fEmail();
-				$email->setFromAddress('noreply@' . fURL::getDomain());
-				$email->addRecipient($email, $user_full_name);
-				$email->setSubjct('Create your inKSpot account!');
+				$email->setFromEmail('noreply@' . $system_domain);
+				$email->addRecipient($email_address, $user_full_name);
+				$email->setSubject('Create your inKSpot account!');
 				
 				$body  = new View();
 				$body -> load ('emails/signup.php')
 					  -> pack ('name', $user_full_name)
-					  -> pack ('path', self::linkTo('*::signup', array(
+					  -> pack ('path', iw::makeLink('*::signup', array(
 					  	':key' => $activation_key
 					  )));
 
-				$email->setBody($body->render(TRUE))->send();
+				$email->setBody($body->render(NULL, TRUE));
+				try {
+					$email->send();
+					fMessaging::create('success', fURL::get(), sprintf(
+						'You should receive an activation e-mail shortly.'
+					));
+				} catch (fConnectivityException $e) {
+					fMessaging::create('error', fURL::get(), sprintf(
+						'There was an error sending your activation ' .
+						'email, please contact ' .
+						'<a href="mailto:info@dotink.org">info@dotink.org</a>'
+					));
+				}
 			}
 
+			if ($key = fRequest::get('key')) {
+				return self::activate($key);
+			}
 
 			$self -> view
 				  -> add   ('contents', 'public/signup.php')
