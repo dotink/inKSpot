@@ -19,8 +19,10 @@ CREATE TABLE groups (
 CREATE TABLE users (
 	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('user_id'),
 	username varchar(32) NOT NULL UNIQUE,
+	full_name varchar(48) DEFAULT '',
+	location varchar(64) DEFAULT '',
+	phone_number varchar(16) DEFAULT '',
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	description varchar(512) NOT NULL DEFAULT ',,,',
 	home varchar(512) NOT NULL,
 	shell varchar(512) NOT NULL DEFAULT '/usr/bin/rssh'
 );
