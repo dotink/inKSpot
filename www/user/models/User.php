@@ -269,7 +269,7 @@
 				$hosts = new fFile('/etc/hosts');
 				$hosts->append(implode(' ', array(
 					'127.0.2.1',
-					$username . '.' . inKSpot::getExternalDomain()
+					$username . '.' . inKSpot::getExternalDomain() . "\n"
 				)));
 
 				self::$building = FALSE;
