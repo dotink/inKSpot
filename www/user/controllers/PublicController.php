@@ -64,11 +64,13 @@
 		 */
 		static private function activate($key)
 		{
+			$self = new self();
 
 			$self -> view
 				  -> add   ('contents', 'public/activate.php')
 				  -> render();
-		
+
+			return $self;
 		}
 
 		/**
@@ -84,7 +86,7 @@
 				$user_full_name = fRequest::get('name');
 				$activation_key = sha1($email_address . microtime());
 				$system_domain  = inKSpot::getExternalDomain();
-				
+
 				try {
 					$activation_request = new ActivationRequest($email_address);
 				} catch (fNotFoundException $e) {
@@ -97,18 +99,19 @@
 				$activation_request->store();
 
 				$self -> view
-					  -> pack ('email_address', $email_address)
-					  -> pack ('name',          $user_full_name);
+					  -> pack ('email', $email_address)
+					  -> pack ('name',  $user_full_name);
 
 				$email = new fEmail();
 				$email->setFromEmail('noreply@' . $system_domain);
 				$email->addRecipient($email_address, $user_full_name);
 				$email->setSubject('Create your inKSpot account!');
-				
+
+				$aurl  =
 				$body  = new View();
 				$body -> load ('emails/signup.php')
-					  -> pack ('name', $user_full_name)
-					  -> pack ('path', iw::makeLink('*::signup', array(
+					  -> pack ('name',  $user_full_name)
+					  -> pack ('path',  iw::makeLink('*::signup', array(
 					  	':key' => $activation_key
 					  )));
 
@@ -134,6 +137,8 @@
 			$self -> view
 				  -> add   ('contents', 'public/signup.php')
 				  -> render();
+
+			return $self;
 		}
 
 	}
