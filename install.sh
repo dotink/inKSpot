@@ -45,8 +45,8 @@ adduser  --system --ingroup inkspot inkspot
 # Add inkspot user to root group and allow write to /home
 ##
 adduser inkspot root
-adduser www-data inkspot
 adduser inkspot www-data
+adduser www-data inkspot
 mkdir /home/users
 chgrp inkspot /home/users
 mkdir /home/domains
@@ -142,7 +142,11 @@ chmod 644 /etc/nss-pgsql-root.conf
 
 cp etc/nsswitch.conf /etc/
 
-echo "Adding inkspot hostname to /etc/hosts..."
+echo "Setting up inKSpot hostsnames..."
+chmod 664 /etc/hosts
+echo >> /etc/hosts
+echo "# inKSpot Domains" >> /etc/hosts
+echo >> /etc/hosts
 echo "127.0.2.1 inkspot" >> /etc/hosts
 
 echo "Setting up NGINX..."
