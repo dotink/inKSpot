@@ -16,7 +16,7 @@ CREATE TABLE auth.user_shadows (
 	status varchar(16) NOT NULL DEFAULT 'Active' CHECK(status IN('Active', 'Inactive', 'System', 'Disabled')),
 	date_created timestamp DEFAULT CURRENT_TIMESTAMP,
 	date_last_accessed timestamp DEFAULT NULL,
-	last_accessed_from varchar(16) NOT NULL
+	last_accessed_from varchar(45) DEFAULT NULL
 );
 
 CREATE TABLE auth.user_email_addresses (

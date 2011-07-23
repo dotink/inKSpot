@@ -71,7 +71,7 @@
 					$key           = fSession::get('key');
 					$user          = new User();
 					$shadow        = new UserShadow();
-					$email         = new UserEmailAddres();
+					$email         = new UserEmailAddress();
 					$request       = new ActivationRequest($key);
 					$username      = fRequest::get('username');
 					$location      = fRequest::get('location');
@@ -82,7 +82,7 @@
 					$user->setFullName($request->getName());
 					$user->store();
 
-					$shadow->setUsername($user->getUsername());
+					$shadow->setUserId($user->getId());
 					$shadow->setLoginPassword($password);
 					$shadow->store();
 					
