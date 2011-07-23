@@ -14,8 +14,25 @@ body {
 }
 
 h1 {
-	font-size: 6.4em;
+	font-size: 4.8em;
 	color: #234567;
 	font-weight: bold;
 }
 
+h2 {
+	font-size: 3.6em;
+	color: #345678;
+	font-weight: bold;
+}
+
+p {
+	font-size: 1.4em;
+}
+
+ul, ol {
+	font-size: 1.4em;
+}
+
+label {
+	font-size: 1.6em;
+}
