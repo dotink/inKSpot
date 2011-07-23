@@ -108,6 +108,10 @@ cp etc/sudoers.d/inkspot /etc/sudoers.d
 chown root:root /etc/sudoers.d/inkspot
 chmod 440 /etc/sudoers.d/inkspot
 
+echo "Removing Strictmodes from SSH..."
+rpl "StrictModes yes" "StrictModes no" /etc/ssh/sshd_config
+/etc/init.d/ssh restart
+
 echo "Reconfiguring postgres authentication..."
 for ver_dir in `ls -1 /etc/postgresql`; do
 	cp etc/postgres/pg_hba.conf /etc/postgresql/$ver_dir/main/
