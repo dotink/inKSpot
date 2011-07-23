@@ -24,7 +24,8 @@ CREATE TABLE users (
 	phone_number varchar(16) DEFAULT '',
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	home varchar(512) NOT NULL,
-	shell varchar(512) NOT NULL DEFAULT '/usr/bin/rssh'
+	shell varchar(512) NOT NULL DEFAULT '/usr/bin/rssh',
+	avatar varchar(512) DEFAULT NULL
 );
 
 CREATE TABLE user_groups (
