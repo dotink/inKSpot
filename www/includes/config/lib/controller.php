@@ -79,7 +79,7 @@
 			),
 
 			'not_found'      => array(
-				'handler'    => NULL,
+				'handler'    => 'PublicController::notFound',
 				'header'     => 'HTTP/1.1 404 Not Found',
 				'message'    => 'The requested resource could not be found'
 			),

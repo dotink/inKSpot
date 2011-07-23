@@ -1,8 +1,8 @@
 <?php
 
-	class inKSpot implements inkwell {
+	class inKSpot implements inkwell
+	{
 	
-		const EXTERNAL_DOMAIN = 'inkspot';
 		const WEB_CONFIGS_DIR = '/home/inkspot/nginx';
 		
 		/**
@@ -12,7 +12,25 @@
 		 * 
 		 * The external domain name for inKSpot
 		 */
-		static private $external_domain = NULL; 
+		static private $external_domain = NULL;
+		
+		/**
+		 * @static
+		 * @access private
+		 * @var string
+		 *
+		 * The e-mail which handles information requests
+		 */
+		static private $information_email = NULL;
+		
+		/**
+		 * @static
+		 * @access private
+		 * @var string
+		 *
+		 * The e-mail which handles support inquiries
+		 */
+		static private $support_email = NULL;
 		
 		/**
 		 * Configures inKSpot
@@ -23,11 +41,30 @@
 		 * @param string $element The name of the configuration element
 		 * @return boolean TRUE if configuration was successful, FALSE otherwise
 		 */
-		static public function __init(Array $config, $element)
+		static public function __init(array $config = array(), $element)
 		{
 			self::$external_domain = isset($config['external_domain'])
 				? $config['external_domain']
-				: self::EXTERNAL_DOMAIN;
+				: NULL;
+			
+			self::$information_email = isset($config['information_email'])
+				? $config['information_email']
+				: NULL;
+
+			self::$support_email = isset($config['support_email'])
+				? $config['support_email']
+				: NULL;
+
+			$failed_config = (
+				!self::$external_domain   ||
+				!self::$information_email ||
+				!self::$support_email
+			);
+			
+			if ($failed_config) {
+				PublicController::setup();
+				exit(1);		
+			}
 			
 			return TRUE;
 		}
@@ -43,6 +80,40 @@
 		static public function getExternalDomain()
 		{
 			return self::$external_domain;
+		}
+
+		/**
+		 * Gets the information e-mail for the system.
+		 *
+		 * @static
+		 * @access public
+		 * @param boolean $as_html_link Return anchor mailing anchor instead
+		 * @return string The current information e-mail address
+		 */
+		static public function getInformationEmail($as_html_link = FALSE)
+		{
+			$email = self::$information_email;
+
+			return ($as_html_link)
+				? sprintf('<a href="mailto:%s">%s</a>', $email, $email)
+				: $email;
+		}
+
+		/**
+		 * Gets the support e-mail for the system.
+		 *
+		 * @static
+		 * @access public
+		 * @param boolean $as_html_link Return anchor mailing anchor instead
+		 * @return string The current support e-mail address
+		 */
+		static public function getSupportEmail($as_html_link = FALSE)
+		{
+			$email = self::$support_email;
+			
+			return ($as_html_link)
+				? sprintf('<a href="mailto:%s">%s</a>', $email, $email)
+				: $email;
 		}
 		
 		/**

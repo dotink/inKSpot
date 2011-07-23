@@ -50,84 +50,31 @@
 
 		/**
 		 * The public facing home page
+		 *
+		 * @static
+		 * @access public
+		 * @param void
+		 * @return View The controller view
 		 */
 		static public function home()
 		{
 			$self =  new self();
+
 			$self -> view
 				  -> add   ('contents', 'public/home.php')
 				  -> render();
+
+			return $self->view;
 		}
 
 		/**
+		 * The signup page.  This page handles the initial activation request
+		 * by a new user.
 		 *
-		 */
-		static private function activate($key)
-		{
-			$self = new self();
-
-			if (fRequest::isPost()) {
-				try {
-					$key           = fSession::get('key');
-					$user          = new User();
-					$shadow        = new UserShadow();
-					$email         = new UserEmailAddress();
-					$request       = new ActivationRequest($key);
-					$username      = fRequest::get('username');
-					$location      = fRequest::get('location');
-					$password      = fRequest::get('login_password');
-
-					$user->setUsername(fRequest::get('username'));
-					$user->setLocation(fRequest::get('location'));
-					$user->setFullName($request->getName());
-					$user->store();
-
-					$shadow->setUserId($user->getId());
-					$shadow->setLoginPassword($password);
-					$shadow->store();
-					
-					$email->setUserId($user->getId());
-					$email->setEmailAddress($request->getEmailAddress());
-					$email->store();
-					
-					$request->delete();
-					fSession::delete('key');
-
-				} catch (fNotFoundException $e) {
-					fMessaging::create('error', fURL::get(), sprintf(
-						'Something went terribly wrong!'
-					));
-				} catch (fValidationException $e) {
-					fMessaging::create('error', fURL::get(), $e->getMessage());
-				}
-				
-				fSession::set('new_user', TRUE);
-				fURL::redirect(iw::makeLink('*::home'));
-			}
-
-			try {
-				$activation_request = new ActivationRequest($key);
-				fSession::set('key', $activation_request->getKey());
-			} catch (fNotFoundException $e) {
-				fMessaging::create('error', fURL::get(), sprintf(
-					'We were unable to find your activation request. '      .
-					'If you have submitted multiple requests you may '      .
-					'need to follow the link in another e-mail.  Or  '      .
-					'requesting a new activation link '                     .
-					'<a href="' . iw::makeLink('*::signup') . '">here</a>.'
-					
-				));
-			}
-
-			$self -> view
-				  -> add   ('contents', 'public/activate.php')
-				  -> render();
-
-			return $self;
-		}
-
-		/**
-		 * The signup page
+		 * @static
+		 * @access public
+		 * @param void
+		 * @return View The controller view
 		 */
 		static public function signup()
 		{
@@ -193,7 +140,119 @@
 				  -> add   ('contents', 'public/signup.php')
 				  -> render();
 
-			return $self;
+			return $self->view;
+		}
+
+		/**
+		 * The not found view -- we'll probably add some kind of site indexing
+		 * and a search with some results based on the URL eventually
+		 *
+		 * @static
+		 * @access protected
+		 * @param void
+		 * @return View The Controller View
+		 */
+		static protected function notFound()
+		{
+			$self = new self();
+
+
+			return $self->view;
+		}
+
+		/**
+		 * This method will be internally redirected to in the event that you
+		 * haven't read the tutorial on setting up inKSpot... wait... there's
+		 * a tutorial?
+		 *
+		 * @static
+		 * @access public
+		 * @param void
+		 * @return View The Controller View
+		 */
+		static public function setup()
+		{
+			$self = new self();
+			
+			$self -> view
+				  -> add    ('contents', 'public/setup.php')
+				  -> push   ('title',    'Whoa there, not so fast!')
+				  -> render ();
+			
+			return $self->view;
+		}
+
+		/**
+		 * The activation page.  This is internally redirected from the
+		 * signup page if a key is provided in the request.
+		 *
+		 * @static
+		 * @access private
+		 * @param string $key The Activation key
+		 * @return View The controller view
+		 */
+		static private function activate($key)
+		{
+			$self = new self();
+
+			if (fRequest::isPost()) {
+				try {
+					$key           = fSession::get('key');
+					$user          = new User();
+					$shadow        = new UserShadow();
+					$email         = new UserEmailAddress();
+					$request       = new ActivationRequest($key);
+					$username      = fRequest::get('username');
+					$location      = fRequest::get('location');
+					$password      = fRequest::get('login_password');
+
+					$user->setUsername(fRequest::get('username'));
+					$user->setLocation(fRequest::get('location'));
+					$user->setFullName($request->getName());
+					$user->store();
+
+					$shadow->setUserId($user->getId());
+					$shadow->setLoginPassword($password);
+					$shadow->store();
+					
+					$email->setUserId($user->getId());
+					$email->setEmailAddress($request->getEmailAddress());
+					$email->store();
+					
+					$request->delete();
+					fSession::delete('key');
+
+				} catch (fNotFoundException $e) {
+					fMessaging::create('error', fURL::get(), sprintf(
+						'Something went terribly wrong!'
+					));
+				} catch (fValidationException $e) {
+					fMessaging::create('error', fURL::get(), $e->getMessage());
+				}
+				
+				fSession::set('new_user', TRUE);
+				fURL::redirect(iw::makeLink('*::home'));
+			}
+
+			try {
+				$activation_request = new ActivationRequest($key);
+				fSession::set('key', $activation_request->getKey());
+			} catch (fNotFoundException $e) {
+				fMessaging::create('error', fURL::get(), sprintf(
+					'We were unable to find your activation request. '      .
+					'If you have submitted multiple requests you may '      .
+					'need to follow the link in another e-mail.  Or  '      .
+					'requesting a new activation link '                     .
+					'<a href="' . iw::makeLink('*::signup') . '">here</a>.'
+					
+				));
+			}
+
+			$self -> view
+				  -> add   ('contents', 'public/activate.php')
+				  -> render();
+
+			return $self->view;
 		}
 
 	}
