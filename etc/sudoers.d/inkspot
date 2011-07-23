@@ -1,1 +1,2 @@
+Defaults umask_override, umask=007
 inkspot ALL = NOPASSWD: /bin/chown, /bin/chmod, /bin/chgrp, /bin/kill, /usr/bin/spawn-fcgi, /usr/sbin/nginx
