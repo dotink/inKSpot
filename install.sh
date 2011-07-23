@@ -109,8 +109,12 @@ chown root:root /etc/sudoers.d/inkspot
 chmod 440 /etc/sudoers.d/inkspot
 
 echo "Removing Strictmodes from SSH..."
-rpl "StrictModes yes" "StrictModes no" /etc/ssh/sshd_config
+rpl  "StrictModes yes" "" /etc/ssh/sshd_config
+echo "StrictModes no" >> /etc/ssh/sshd_config
 /etc/init.d/ssh restart
+
+echo "Setting up RSSH..."
+cp etc/rssh.conf /etc/rssh.conf
 
 echo "Reconfiguring postgres authentication..."
 for ver_dir in `ls -1 /etc/postgresql`; do

@@ -186,13 +186,22 @@
 
 				try {
 					$home      = fDirectory::create('/home/users/' . $username);
+					$sshdir    = fDirectory::create($home          . '.ssh');
 					$www       = fDirectory::create($home          . 'www');
 					$localwww  = fDirectory::create($www           . 'local');
 					$userwww   = fDirectory::create($localwww      . $username);
 					$docroot   = fDirectory::create($userwww       . 'docroot');
 					$mail      = fDirectory::create($home          . 'mail');
-					$sshdir    = fDirectory::create($home          . '.ssh');
 					$auth_keys = fFile::create($sshdir . 'authorized_keys', '');
+					
+					$immutable = array(
+						'home', 'www', 'localwww', 'userwww', 'docroot'
+					);
+					
+					foreach ($immutable as $dir) {
+						fFile::create($$dir . '.immutable', '');					
+					}
+
 				} catch (fValidationException $e) {
 					fFilesystem::rollback();
 					throw new fEnvironmentException (
@@ -216,17 +225,25 @@
 
 				$values['home']     = $home->getPath();
 				$values['group_id'] = $group->getId();
-
-				self::$building = TRUE;
+				self::$building     = TRUE;
 
 			} elseif (self::$building) {
 
-				// Operations performed after user account creation
-
-				$home     = $values['home'];
-				$username = $values['username'];
+				// If we got here we can commit our filesystem changes
 
 				fFilesystem::commit();
+
+				// Now we need to fix up permissions, let's first define
+				// our directories again.
+
+				$username  = $values['username'];
+				$home      = $values['home'];
+				$sshdir    = $home     . '.ssh'    . DIRECTORY_SEPARATOR;
+				$www       = $home     . 'www'     . DIRECTORY_SEPARATOR;
+				$localwww  = $www      . 'local'   . DIRECTORY_SEPARATOR;
+				$userwww   = $localwww . $username . DIRECTORY_SEPARATOR;
+				$docroot   = $userwww  . 'docroot' . DIRECTORY_SEPARATOR;
+				$auth_keys = $sshdir   . 'authorize_keys';
 
 				// User owns their home, but it falls under group inkspot
 				// so that trusted users cannot view outside of their
@@ -236,23 +253,45 @@
 				sexec('chgrp -R inkspot ' . $home);
 				sexec('chmod -R g+s '     . $home);
 
-				// Make .ssh folders owned by inkspot so they cannot
-				// be modified by user via SSH
+				// Make .ssh folder and files owned by inkspot so they cannot
+				// be modified by user via SSH.  
 
-				sexec('chown -R inkspot ' . $home . '.ssh');
+				sexec('chown -R inkspot ' . $sshdir);
+				sexec('chmod 750 '        . $sshdir);
+				sexec('chmod 640 '        . $auth_keys);
 
-				// Make the user's www have their group and change
-				// to g+s so all files and dirs created within it also
-				// have that group
-
-				$userwww = $home . 'www/local/' . $username;
+				// Make the user's www has their group and change and is setgid
+				// so all files and dirs created within it also use their
+				// group.  
 
 				sexec('chgrp -R  ' . $username . ' ' . $userwww);
 				sexec('chmod g+s ' . $userwww);
+
+				// Remove write permissions for www leading directories,
+				// preventing users from creating stray directories or
+				// renaming others without changing permissions.
+				
+				sexec('chmod u-w ' . $www);
+				sexec('chmod u-w ' . $localwww);
+
+				// Make path leading up to user's www executable by all so
+				// users not in 'inkspot' group can cd to them, but not read
+				// them.
+
 				sexec('chmod a+x ' . $home);
-				sexec('chmod a+x ' . $home . 'www');
-				sexec('chmod a+x ' . $home . 'www/local');
+				sexec('chmod a+x ' . $www);
+				sexec('chmod a+x ' . $localwww);
 				sexec('chmod a+x ' . $userwww);
+
+				// Make all immutable files... well... umm immutable.  This
+				// prevents the directories from being removed by any user
+				// except root.
+
+				sexec('chattr +i ' . $home     . '.immutable');
+				sexec('chattr +i ' . $www      . '.immutable');
+				sexec('chattr +i ' . $localwww . '.immutable');
+				sexec('chattr +i ' . $userwww  . '.immutable');
+				sexec('chattr +i ' . $docroot  . '.immutable');
 
 				$hosts = new fFile('/etc/hosts');
 				$hosts->append(implode(' ', array(
@@ -315,17 +354,16 @@
 		{
 			$sub_config  = '';
 			$username    = $this->getUsername();
+			$domain      = $this->getDomain();
+
 			$userwww     = implode(DIRECTORY_SEPARATOR, array(
 				$this->getHome() . 'www/local', // localwww
 				$username,                      // userwww
 				'docroot'                       // docroot
 			));
-			$domain      = $this->getDomain();
 
 			$web_configs =	UserWebConfigurations::build(
-				array(
-					'user_id=' => $this->getId()
-				)
+				array('user_id=' => $this->getId())
 			);	
 
 			foreach ($web_configs as $web_config) {
@@ -391,7 +429,7 @@
 			$dst      = '/home/users/' . $dst_user . '/www/local/' . $src_user;
 
 			exec('ln -s ' . $src . ' ' . $dst);
-			exec('chmod 775 ' . $dst);
+			sexec('chattr -i ' . $dst);
 		}
 
 		/**
@@ -415,6 +453,7 @@
 			$dst_user = $user->getUsername();
 			$dst      = '/home/users/' . $dst_user . '/www/local/' . $src_user;
 
+			sexec('chattr -i ' . $dst);
 			exec('rm ' . $dst);
 		}
 
