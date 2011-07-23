@@ -512,13 +512,15 @@
 				if ($element !== '__types' && !in_array($element, $core)) {
 
 					if (isset($config['class'])) {
+
 						fGrammar::addCamelUnderscoreRule(
-							$config['class'],
+							$class = $config['class'],
 							$element
 						);
-					}
 
-					$class = fGrammar::camelize($element, TRUE);
+					} else {
+						$class = fGrammar::camelize($element, TRUE);					
+					}
 
 					if (isset($config['root_directory'])) {
 						self::$roots[$element] = $config['root_directory'];

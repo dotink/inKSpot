@@ -1340,17 +1340,6 @@ class MoorProgrammerException extends MoorException {}
 class MoorContinueException extends MoorException {}
 class MoorNotFoundException extends MoorException {}
 
-// ============
-// = Includes =
-// ============
-
-if (!class_exists('MoorAbtractController', FALSE)) {
-	require 'MoorAbstractController.php';
-}
-if (!class_exists('MoorActionController', FALSE)) {
-	require 'MoorActionController.php';
-}
-
 // ===========
 // = License =
 // ===========
