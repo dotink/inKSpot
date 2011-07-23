@@ -146,19 +146,12 @@
 		 * @static
 		 * @access public
 		 * @param UserShadow $shadow The user shadow to update
-		 * @param integer $days The number of days since Epoch, default is today
 		 * @return void
 		 */
-		static public function updateLastChangeDays(UserShadow $shadow, $days = NULL)
+		static public function updateLastChangeDays(UserShadow $shadow, &$values, &$old_values)
 		{
-			if ($days == NULL) {
-				$days = floor(time() / 60 / 60 / 24);
-			}
-			
-			$shadow->setLastChangeDays($days);
-			
-			if ($shadow->exists()) {
-				$shadow->store();
+			if (!$shadow->exists() || count($old_values['login_password'])) {
+				$values['last_change_days'] = intval(time() / 60 / 60 / 24);
 			}
 		}
 
