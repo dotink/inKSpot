@@ -6,7 +6,7 @@ CREATE SEQUENCE user_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 CREATE TABLE activation_requests (
 	key varchar(256) NOT NULL PRIMARY KEY,
 	name varchar(64) NOT NULL,
-	email_address varchar(256) NOT NULL
+	email_address varchar(256) NOT NULL UNIQUE
 );
 
 CREATE TABLE groups (
@@ -27,20 +27,6 @@ CREATE TABLE users (
 	shell varchar(512) NOT NULL DEFAULT '/usr/bin/rssh'
 );
 
-CREATE TABLE user_shadows (
-	username varchar(32) NOT NULL PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE,
-	email_address varchar(256) NOT NULL UNIQUE,
-	login_password varchar(512) DEFAULT NULL,
-	last_change_days int NOT NULL DEFAULT CURRENT_DATE - DATE '1970-01-01',
-	min_change_days int NOT NULL DEFAULT '0',
-	max_change_days int NOT NULL DEFAULT '9999',
-	warn_days int4 NOT NULL DEFAULT '7',
-	disable_inactive_days int4 DEFAULT '7',
-	expiration_days int DEFAULT '36500',
-	account_expired boolean NOT NULL DEFAULT FALSE,
-	request_new_password boolean NOT NULL DEFAULT FALSE
-);
-
 CREATE TABLE user_groups (
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	user_id int4 NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -56,13 +42,6 @@ CREATE TABLE user_friends (
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	friend_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (user_id, friend_id)
-);
-
-CREATE TABLE user_public_keys (
-	id serial PRIMARY KEY,
-	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	description varchar(64) NOT NULL,
-	public_key text NOT NULL
 );
 
 CREATE TABLE domains (

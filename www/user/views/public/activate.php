@@ -3,8 +3,8 @@
 	<% fMessaging::show('error',   fURL::get()) %>
 	<% fMessaging::show('success', fURL::get()) %>
 	
-	<label for="username">Username:</label>
-	<input id="username" type="text" max_length="32" name="name" value="<%= fHTML::encode($this->pull('username', '')) %>" />
+	<label for="username">Desired Username:</label>
+	<input id="username" type="text" max_length="32" name="username" value="<%= fHTML::encode($this->pull('username', '')) %>" />
 
 	<label for="location">Location:</label>
 	<input id="location" type="text" max_length="64" name="location" value="<%= fHTML::encode($this->pull('location', '')) %>" />

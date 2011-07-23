@@ -103,9 +103,10 @@ echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
 rpl "umask 022" "umask 007" /etc/profile
 umask 007
 
-echo "Giving inkspot suexec ability..." 
-chown root:inkspot /home/inkspot/bin/suexec
-chmod 4750 /home/inkspot/bin/suexec
+echo "Giving inkspot sudo-ability..."
+cp etc/sudoers.d/inkspot /etc/sudoers.d
+chown root:root /etc/sudoers.d/inkspot
+chmod 440 /etc/sudoers.d/inkspot
 
 echo "Reconfiguring postgres authentication..."
 for ver_dir in `ls -1 /etc/postgresql`; do
@@ -123,6 +124,7 @@ echo "CREATE USER inkspot" | sudo -u postgres psql
 echo "CREATE USER inkspot_ro PASSWORD '$password';" | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 psql -U inkspot < support/inkspot.sql
+psql -U inkspot < support/auth.sql
 
 echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/

@@ -196,8 +196,9 @@
 				} catch (fValidationException $e) {
 					fFilesystem::rollback();
 					throw new fEnvironmentException (
-						'Could not build home directory for user %s',
-						$username
+						'Could not build home directory for user %s: %s',
+						$username,
+						$e->getMessage()
 					);
 				}
 
@@ -224,19 +225,6 @@
 
 				$home     = $values['home'];
 				$username = $values['username'];
-
-				try {
-					$shadow = new UserShadow();
-					$shadow->setUsername($username);
-					$shadow->setLastChangeDays(floor(time() / 60 / 60 / 24));
-					$shadow->store();
-				} catch (fException $e) {
-					fFilesystem::rollback();
-					throw new fEnvironmentException (
-						'Unable to create shadow for user %s',
-						$username
-					);
-				}
 
 				fFilesystem::commit();
 

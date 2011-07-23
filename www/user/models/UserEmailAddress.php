@@ -1,17 +1,17 @@
 <?php
 
 	/**
-	 * The UserShadow is an active record and model representing a single
-	 * UserShadow record.
+	 * The UserEmailAddress is an active record and model representing a single
+	 * User Email Address record.
 	 *
 	 * @author Matthew J. Sahagian [mjs] <gent@dotink.org>
 	 * @copyright Copyright (c) 2011, Matthew J. Sahagian
 	 */
-	class UserShadow extends ActiveRecord
+	class UserEmailAddress extends ActiveRecord
 	{
 
 		/**
-		 * Initializes all static class information for the UserShadow model
+		 * Initializes all static class information for the UserEmailAddress model
 		 *
 		 * @static
 		 * @access public
@@ -22,16 +22,10 @@
 		static public function __init(array $config = array(), $element = NULL)
 		{
 			parent::__init($config, $element);
-			fORM::registerHookCallback(
-				__CLASS__,
-				'pre::validate()',
-				iw::makeTarget(__CLASS__, 'updateLastChangeDays')
-			);
-
 		}
 
 		/**
-		 * Gets the record name for the UserShadow class
+		 * Gets the record name for the UserEmailAddress class
 		 *
 		 * @static
 		 * @access public
@@ -44,7 +38,7 @@
 		}
 
 		/**
-		 * Gets the record table name for the UserShadow class
+		 * Gets the record table name for the UserEmailAddress class
 		 *
 		 * @static
 		 * @access public
@@ -57,7 +51,7 @@
 		}
 
 		/**
-		 * Gets the record set name for the UserShadow class
+		 * Gets the record set name for the UserEmailAddress class
 		 *
 		 * @static
 		 * @access public
@@ -70,7 +64,7 @@
 		}
 
 		/**
-		 * Gets the entry name for the UserShadow class
+		 * Gets the entry name for the UserEmailAddress class
 		 *
 		 * @static
 		 * @access public
@@ -83,7 +77,7 @@
 		}
 
 		/**
-		 * Gets the order for the UserShadow class
+		 * Gets the order for the UserEmailAddress class
 		 *
 		 * @static
 		 * @access public
@@ -110,7 +104,7 @@
 		}
 
 		/**
-		 * Creates a new UserShadow from a slug and identifier.  The
+		 * Creates a new UserEmailAddress from a slug and identifier.  The
 		 * identifier is optional, but if is provided acts as an additional
 		 * check against the validity of the record.
 		 *
@@ -126,7 +120,7 @@
 		}
 
 		/**
-		 * Creates a new UserShadow from a provided resource key.
+		 * Creates a new UserEmailAddress from a provided resource key.
 		 *
 		 * @static
 		 * @access public
@@ -137,29 +131,6 @@
 		static public function createFromResourceKey($resource_key)
 		{
 			return parent::createFromResourceKey(__CLASS__, $resource_key);
-		}
-
-		/**
-		 * Updates the number of days since the password was last changed
-		 * for a given user shadow.
-		 *
-		 * @static
-		 * @access public
-		 * @param UserShadow $shadow The user shadow to update
-		 * @param integer $days The number of days since Epoch, default is today
-		 * @return void
-		 */
-		static public function updateLastChangeDays(UserShadow $shadow, $days = NULL)
-		{
-			if ($days == NULL) {
-				$days = floor(time() / 60 / 60 / 24);
-			}
-			
-			$shadow->setLastChangeDays($days);
-			
-			if ($shadow->exists()) {
-				$shadow->store();
-			}
 		}
 
 	}

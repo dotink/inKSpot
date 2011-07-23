@@ -66,6 +66,59 @@
 		{
 			$self = new self();
 
+			if (fRequest::isPost()) {
+				try {
+					$key           = fSession::get('key');
+					$user          = new User();
+					$shadow        = new UserShadow();
+					$email         = new UserEmailAddres();
+					$request       = new ActivationRequest($key);
+					$username      = fRequest::get('username');
+					$location      = fRequest::get('location');
+					$password      = fRequest::get('login_password');
+
+					$user->setUsername(fRequest::get('username'));
+					$user->setLocation(fRequest::get('location'));
+					$user->setFullName($request->getName());
+					$user->store();
+
+					$shadow->setUsername($user->getUsername());
+					$shadow->setLoginPassword($password);
+					$shadow->store();
+					
+					$email->setUserId($user->getId());
+					$email->setEmailAddress($request->getEmailAddress());
+					$email->store();
+					
+					$request->delete();
+					fSession::delete('key');
+
+				} catch (fNotFoundException $e) {
+					fMessaging::create('error', fURL::get(), sprintf(
+						'Something went terribly wrong!'
+					));
+				} catch (fValidationException $e) {
+					fMessaging::create('error', fURL::get(), $e->getMessage());
+				}
+				
+				fSession::set('new_user', TRUE);
+				fURL::redirect(iw::makeLink('*::home'));
+			}
+
+			try {
+				$activation_request = new ActivationRequest($key);
+				fSession::set('key', $activation_request->getKey());
+			} catch (fNotFoundException $e) {
+				fMessaging::create('error', fURL::get(), sprintf(
+					'We were unable to find your activation request. '      .
+					'If you have submitted multiple requests you may '      .
+					'need to follow the link in another e-mail.  Or  '      .
+					'requesting a new activation link '                     .
+					'<a href="' . iw::makeLink('*::signup') . '">here</a>.'
+					
+				));
+			}
+
 			$self -> view
 				  -> add   ('contents', 'public/activate.php')
 				  -> render();
@@ -80,6 +133,10 @@
 		{
 			$self = new self();
 
+			if ($key = fRequest::get('key')) {
+				return self::activate($key);
+			}
+
 			if (fRequest::isPost()) {
 
 				$email_address  = fRequest::get('email_address');
@@ -88,7 +145,9 @@
 				$system_domain  = inKSpot::getExternalDomain();
 
 				try {
-					$activation_request = new ActivationRequest($email_address);
+					$activation_request = new ActivationRequest(array(
+						'email_address' => $email_address
+					));
 				} catch (fNotFoundException $e) {
 					$activation_request = new ActivationRequest();
 					$activation_request->setEmailAddress($email_address);
@@ -128,10 +187,6 @@
 						'<a href="mailto:info@dotink.org">info@dotink.org</a>'
 					));
 				}
-			}
-
-			if ($key = fRequest::get('key')) {
-				return self::activate($key);
 			}
 
 			$self -> view
