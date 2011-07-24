@@ -40,6 +40,7 @@ freshclam
 ##
 addgroup --system inkspot
 adduser  --system --ingroup inkspot inkspot
+chsh inkspot -s /bin/bash
 
 ##
 # Add inkspot user to root group and allow write to /home
