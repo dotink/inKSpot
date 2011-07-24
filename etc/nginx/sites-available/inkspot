@@ -11,7 +11,7 @@ server {
 
 	# Determines whether or not inkwell should use rewriting
 
-	set $iw_rewrite_enabled 0;
+	set $iw_rewrite_enabled 1;
 
 	# Deny access to .hidden files, if Apache's document root
 	# concurs with nginx's one
