@@ -834,6 +834,19 @@
 		}
 
 		/**
+		 * Checks the SAPI name
+		 *
+		 * @static
+		 * @access public
+		 * @param string $sapi The SAPI to verify running
+		 * @return bollean TRUE if the running SAPI matches, FALSE otherwise
+		 */
+		static public function checkSAPI($sapi)
+		{
+			return (strtolower(php_sapi_name()) == 'cli');
+		}
+
+		/**
 		 * The inKWell conditional autoloader which allows for auto loading
 		 * based on dynamic class name matches.
 		 *
