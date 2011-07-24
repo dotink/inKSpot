@@ -69,6 +69,8 @@ cp -R www/* /home/inkspot/www
 chown -R inkspot:inkspot /home/inkspot/www
 ln -s /home/inkspot/www/user/styles  /home/inkspot/www/writable/
 ln -s /home/inkspot/www/user/scripts /home/inkspot/www/writable/
+chown inkspot:inkspot /home/inkspot/www/writable/styles
+chown inkspot:inkspot /home/inkspot/www/writable/scripts
 
 ##
 # Make sure the console is only ever run as inkspot
@@ -106,7 +108,7 @@ chown inkspot:inkspot /etc/inkspot
 
 echo "Updating umask..."
 echo 'session optional pam_umask.so umask=007' >> /etc/pam.d/common-session
-rpl "umask 022" "umask 007" /etc/profile
+rpl -q "umask 022" "umask 007" /etc/profile
 umask 007
 
 echo "Giving inkspot sudo-ability..."
@@ -115,7 +117,7 @@ chown root:root /etc/sudoers.d/inkspot
 chmod 440 /etc/sudoers.d/inkspot
 
 echo "Removing Strictmodes from SSH..."
-rpl  "StrictModes yes" "" /etc/ssh/sshd_config
+rpl  -q "StrictModes yes" "" /etc/ssh/sshd_config
 echo "StrictModes no" >> /etc/ssh/sshd_config
 /etc/init.d/ssh restart
 
