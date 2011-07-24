@@ -254,11 +254,12 @@
 				sexec('chmod -R g+s '     . $home);
 
 				// Make .ssh folder and files owned by inkspot so they cannot
-				// be modified by user via SSH.  
+				// be modified by user via SSH, but make them group readable
+				// so we can log in!
 
-				sexec('chown -R inkspot ' . $sshdir);
-				sexec('chmod 750 '        . $sshdir);
-				sexec('chmod 640 '        . $auth_keys);
+				sexec('chown -R inkspot:' . $username . ' ' . $sshdir);
+				sexec('chmod 750 '                          . $sshdir);
+				sexec('chmod 640 '                          . $auth_keys);
 
 				// Make the user's www has their group and change and is setgid
 				// so all files and dirs created within it also use their
