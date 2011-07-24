@@ -148,11 +148,11 @@ password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
 
 echo "Setting up PowerDNS database user and permissions"
 echo "CREATE USER inkspot_dns WITH PASSWORD '$password';" | sudo -u postgres psql
-echo "GRANT SELECT ON supermasters TO inkspot_dns;" | sudo -u postgresl psql
-echo "GRANT ALL ON domains TO inkspot_dns;" | sudo -u postgresql psql
-echo "GRANT ALL ON domains_id_seq TO inkspot_dns;" | sudo -u postgresql psql
-echo "GRANT ALL ON records TO inkspot_dns;" | sudo -u postgresql psql
-echo "GRANT ALL ON records_id_seq TO inkspot_dns;" | sudo -u postgresql psql
+echo "GRANT SELECT ON supermasters TO inkspot_dns;" | sudo -u postgres psql
+echo "GRANT ALL ON domains TO inkspot_dns;" | sudo -u postgres psql
+echo "GRANT ALL ON domains_id_seq TO inkspot_dns;" | sudo -u postgres psql
+echo "GRANT ALL ON records TO inkspot_dns;" | sudo -u postgres psql
+echo "GRANT ALL ON records_id_seq TO inkspot_dns;" | sudo -u postgres psql
 
 echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
