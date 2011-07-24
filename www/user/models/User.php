@@ -243,7 +243,7 @@
 				$localwww  = $www      . 'local'   . DIRECTORY_SEPARATOR;
 				$userwww   = $localwww . $username . DIRECTORY_SEPARATOR;
 				$docroot   = $userwww  . 'docroot' . DIRECTORY_SEPARATOR;
-				$auth_keys = $sshdir   . 'authorize_keys';
+				$auth_keys = $sshdir   . 'authorized_keys';
 
 				// User owns their home, but it falls under group inkspot
 				// so that trusted users cannot view outside of their
