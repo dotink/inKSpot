@@ -18,6 +18,15 @@ echo "DROP USER inkspot" | sudo -u postgres psql
 echo "DROP USER inkspot_ro" | sudo -u postgres psql
 
 rm -rf /home/inkspot
+
+for file in `find /home/users -name .immutable`; do
+	chattr -i $file
+done
 rm -rf /home/users
+
+for file in `find /home/domains -name .immutable`; do
+	chattr -i $file
+done
 rm -rf /home/domains
+
 rm -rf /etc/inkspot
