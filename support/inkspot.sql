@@ -1,6 +1,6 @@
 BEGIN;
 
-CREATE FUNCTION epoch_seconds() RETURN integer
+CREATE FUNCTION epoch_seconds() RETURNS integer
 	AS 'SELECT extract(EPOCH FROM CURRENT_TIMESTAMP)::int;'
 	LANGUAGE SQL;
 
