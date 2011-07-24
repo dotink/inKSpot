@@ -173,9 +173,12 @@
 		static public function setup()
 		{
 			$self = new self();
-			
+			$view = (iw::checkSAPI('cli'))
+				? 'cli/setup.php'
+				: 'public/setup.php'
+
 			$self -> view
-				  -> add    ('contents', 'public/setup.php')
+				  -> add    ('contents', $view)
 				  -> push   ('title',    'Whoa there, not so fast!')
 				  -> render ();
 			
