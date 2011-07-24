@@ -135,24 +135,28 @@ for ver_dir in `ls -1 /etc/postgresql`; do
 done
 /etc/init.d/postgresql restart
 
-password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+
 
 echo "Setting up inKSpot database and permissions..."
-echo "CREATE USER inkspot" | sudo -u postgres psql
-echo "CREATE USER inkspot_ro PASSWORD '$password';" | sudo -u postgres psql
+password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+echo "CREATE USER inkspot"                                    | sudo -u postgres psql
+echo "CREATE USER inkspot_ro PASSWORD '$password';"           | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 psql -U inkspot < support/inkspot.sql
 psql -U inkspot < support/auth.sql
 
-password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+
 
 echo "Setting up PowerDNS database user and permissions"
-echo "CREATE USER inkspot_dns WITH PASSWORD '$password';" | sudo -u postgres psql
-echo "GRANT SELECT ON supermasters TO inkspot_dns;" | sudo -u postgres psql
-echo "GRANT ALL ON domains TO inkspot_dns;" | sudo -u postgres psql
-echo "GRANT ALL ON domains_id_seq TO inkspot_dns;" | sudo -u postgres psql
-echo "GRANT ALL ON records TO inkspot_dns;" | sudo -u postgres psql
-echo "GRANT ALL ON records_id_seq TO inkspot_dns;" | sudo -u postgres psql
+password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+echo "CREATE USER inkspot_dns WITH PASSWORD '$password';"  | sudo -u postgres psql
+
+echo "Granting permissions to inkspot_dns user"
+echo "GRANT ALL ON domains TO inkspot_dns;"                | psql -U inkspot
+echo "GRANT ALL ON domain_records TO inkspot_dns;"         | psql -U inkspot
+echo "GRANT SELECT ON domain_supermasters TO inkspot_dns;" | psql -U inkspot
+echo "GRANT ALL ON domains_id_seq TO inkspot_dns;"         | psql -U inkspot
+echo "GRANT ALL ON domain_records_id_seq TO inkspot_dns;"  | psql -U inkspot
 
 echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
