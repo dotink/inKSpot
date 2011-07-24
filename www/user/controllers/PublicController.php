@@ -89,7 +89,7 @@
 				$email_address  = fRequest::get('email_address');
 				$user_full_name = fRequest::get('name');
 				$activation_key = sha1($email_address . microtime());
-				$system_domain  = inKSpot::getExternalDomain();
+				$system_domain  = inKSpot::getDomain();
 
 				try {
 					$activation_request = new ActivationRequest(array(
@@ -161,33 +161,6 @@
 		}
 
 		/**
-		 * This method will be internally redirected to in the event that you
-		 * haven't read the tutorial on setting up inKSpot... wait... there's
-		 * a tutorial?
-		 *
-		 * @static
-		 * @access public
-		 * @param void
-		 * @return View The Controller View
-		 */
-		static public function setup()
-		{
-			$self = new self();
-
-			if (iw::checkSAPI('cli')) {
-				$self->view->load('cli/setup.php');
-			} else {
-				$self -> view
-					  -> add  ('contents', $view)
-					  -> push ('title',    'Whoa there, not so fast!');
-			}
-			
-			$self->view->render();
-			
-			return $self->view;
-		}
-
-		/**
 		 * The activation page.  This is internally redirected from the
 		 * signup page if a key is provided in the request.
 		 *
@@ -213,7 +186,7 @@
 
 					$user->setUsername(fRequest::get('username'));
 					$user->setLocation(fRequest::get('location'));
-					$user->setFullName($request->getName());
+					$user->setName($request->getName());
 					$user->store();
 
 					$shadow->setUserId($user->getId());

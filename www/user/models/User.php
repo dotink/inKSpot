@@ -341,7 +341,7 @@
 		 */
 		public function getDomain()
 		{
-			return $this->getUsername() . '.' . inKSpot::getExternalDomain();
+			return $this->getUsername() . '.' . inKSpot::getDomain();
 		}
 
 		/**

@@ -4,16 +4,7 @@
 	{
 	
 		const WEB_CONFIGS_DIR = '/home/inkspot/nginx';
-		
-		/**
-		 * @static
-		 * @access private
-		 * @var string
-		 * 
-		 * The external domain name for inKSpot
-		 */
-		static private $external_domain = NULL;
-		
+				
 		/**
 		 * @static
 		 * @access private
@@ -42,11 +33,7 @@
 		 * @return boolean TRUE if configuration was successful, FALSE otherwise
 		 */
 		static public function __init(array $config = array(), $element)
-		{
-			self::$external_domain = isset($config['external_domain'])
-				? $config['external_domain']
-				: NULL;
-			
+		{			
 			self::$information_email = isset($config['information_email'])
 				? $config['information_email']
 				: NULL;
@@ -54,32 +41,21 @@
 			self::$support_email = isset($config['support_email'])
 				? $config['support_email']
 				: NULL;
-
-			$failed_config = (
-				!self::$external_domain   ||
-				!self::$information_email ||
-				!self::$support_email
-			);
-			
-			if ($failed_config) {
-				PublicController::setup();
-				exit(1);		
-			}
 			
 			return TRUE;
 		}
 		
 		/**
-		 * Gets the external domain name for inkSpot
+		 * Gets the domain name for inkSpot
 		 *
 		 * @static
 		 * @access public
 		 * @param void
-		 * @return string The current external domain for inKSpot
+		 * @return string The current domain for inKSpot
 		 */
-		static public function getExternalDomain()
+		static public function getDomain()
 		{
-			return self::$external_domain;
+			return parse_url(fURL::getDomain(), PHP_URL_HOST);
 		}
 
 		/**

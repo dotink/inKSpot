@@ -23,14 +23,15 @@ if [ $? == 0 ]; then
 fi
 
 echo "Installing base system software..."
-apt-get -qq install rssh                                        # Restricted Shell
-apt-get -qq install postgresql libpam-pgsql libnss-pgsql2       # Database
-apt-get -qq install php5 php5-cli php5-cgi php5-pgsql           # PHP Stuff
-apt-get -qq install nginx spawn-fcgi mono-fastcgi-server        # WebServer Stuff
-apt-get -qq install postfix postfix-pgsql                       # SMTP  Stuff
-apt-get -qq install dovecot-common dovecot-imapd dovecot-pop3d  # POP/IMAP Stuff
-apt-get -qq install spamassassin                                # Anti-Spam Stuff
-apt-get -qq install clamsmtp clamav-freshclam                   # Anti-Virus Stuff
+apt-get -qq install rssh                                                         # Restricted Shell
+apt-get -qq install postgresql postgresql-contrib libpam-pgsql libnss-pgsql2     # Database
+apt-get -qq install pdns-backend-pgsql pdns-doc pdns-recursor pdns-server        # PowerDNS Stuff
+apt-get -qq install php5 php5-cli php5-cgi php5-pgsql                            # PHP Stuff
+apt-get -qq install nginx spawn-fcgi mono-fastcgi-server                         # WebServer Stuff
+apt-get -qq install postfix postfix-pgsql                                        # SMTP  Stuff
+apt-get -qq install dovecot-common dovecot-imapd dovecot-pop3d                   # POP/IMAP Stuff
+apt-get -qq install spamassassin                                                 # Anti-Spam Stuff
+apt-get -qq install clamsmtp clamav-freshclam                                    # Anti-Virus Stuff
 
 echo "Running freshclam for the first time..."
 freshclam
@@ -142,6 +143,16 @@ echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres
 psql -U inkspot < support/inkspot.sql
 psql -U inkspot < support/auth.sql
 
+password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+
+echo "Setting up PowerDNS database user and permissions"
+echo "CREATE USER inkspot_dns WITH PASSWORD '$password';" | sudo -u postgres psql
+echo "GRANT SELECT ON supermasters TO inkspot_dns;" | sudo -u postgresl psql
+echo "GRANT ALL ON domains TO inkspot_dns;" | sudo -u postgresql psql
+echo "GRANT ALL ON domains_id_seq TO inkspot_dns;" | sudo -u postgresql psql
+echo "GRANT ALL ON records TO inkspot_dns;" | sudo -u postgresql psql
+echo "GRANT ALL ON records_id_seq TO inkspot_dns;" | sudo -u postgresql psql
+
 echo "Setting up PAM for PostgreSQL..."
 cp etc/pam_pgsql.conf /etc/
 chmod 644 /etc/pam_pgsql.conf
@@ -178,3 +189,9 @@ mkdir /home/inkspot/var/cgi
 mkdir /home/inkspot/var/cgi/domains
 mkdir /home/inkspot/var/cgi/users
 chown -R inkspot:inkspot /home/inkspot/var
+
+echo "Getting domain for setup..."
+dialog --inputbox Domain 30 80 2>.domain
+
+echo "Running setup..."
+www/iw.console support/setup.php

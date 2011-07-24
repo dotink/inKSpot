@@ -149,7 +149,7 @@
 			return implode(DIRECTORY_SEPARATOR, array(
 				parent::SOCK_ROOT,
 				self::SOCK_ROOT,
-				$domain->getDomain() . '.' . $engine->getName()
+				$domain->getName() . '.' . $engine->getName()
 			));
 		}
 

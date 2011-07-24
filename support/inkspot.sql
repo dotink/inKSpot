@@ -19,7 +19,7 @@ CREATE TABLE groups (
 CREATE TABLE users (
 	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('user_id'),
 	username varchar(32) NOT NULL UNIQUE,
-	full_name varchar(48) DEFAULT '',
+	name varchar(48) DEFAULT '',
 	location varchar(64) DEFAULT '',
 	phone_number varchar(16) DEFAULT '',
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -47,11 +47,38 @@ CREATE TABLE user_friends (
 
 CREATE TABLE domains (
 	id serial PRIMARY KEY,
-	domain varchar(256) NOT NULL UNIQUE,
+	name varchar(256) NOT NULL UNIQUE,
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	user_id int4 NOT NULL REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	description varchar(256) NOT NULL,
-	alias_for varchar(256) REFERENCES domains(domain) ON DELETE CASCADE ON UPDATE CASCADE,
-	owner integer NOT NULL REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	master varchar(128) DEFAULT NULL,
+	last_check int DEFAULT NULL,
+	type varchar(6) NOT NULL CHECK(type IN('MASTER', 'SLAVE', 'internal'))) DEFAULT 'MASTER',
+	notified_serial INT DEFAULT NULL,
+	account VARCHAR(40) DEFAULT NULL		
+);
+
+CREATE TABLE domain_records (
+	id SERIAL PRIMARY KEY,
+	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	name varchar(256) DEFAULT NULL,
+	type varchar(6) NOT NULL CHECK(type IN('SOA', 'NS', 'MX', 'A', 'AAAA', 'CNAME')) DEFAULT 'A',
+	content VARCHAR(256) DEFAULT NULL,
+	ttl int4 DEFAULT '1200',
+	prio int4 DEFAULT NULL,
+	change_date int DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE domain_aliases
+
+CREATE INDEX rec_name_index ON records(name);
+CREATE INDEX nametype_index ON records(name,type);
+CREATE INDEX domain_id ON records(domain_id);
+
+CREATE TABLE domain_supermasters (
+	ip varchar(45) NOT NULL,
+	nameserver varchar(256) NOT NULL,
+	account varchar(40) DEFAULT NULL
 );
 
 CREATE TABLE domain_mail_settings (

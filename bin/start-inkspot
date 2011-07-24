@@ -30,7 +30,7 @@
 				sprintf(
 					'Failed to start %s engine for domain "%s"',
 					$engine->getName(),
-					$domain->getDomain()
+					$domain->getName()
 				),
 				E_USER_WARNING
 			);
