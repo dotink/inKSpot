@@ -73,9 +73,9 @@ CREATE TABLE domain_records (
 	change_date int DEFAULT epoch_seconds()
 );
 
-CREATE INDEX rec_name_index ON records(name);
-CREATE INDEX nametype_index ON records(name,type);
-CREATE INDEX domain_id ON records(domain_id);
+CREATE INDEX rec_name_index ON domain_records(name);
+CREATE INDEX nametype_index ON domain_records(name,type);
+CREATE INDEX domain_id ON domain_records(domain_id);
 
 CREATE TABLE domain_supermasters (
 	ip varchar(45) NOT NULL,
