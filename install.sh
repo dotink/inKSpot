@@ -71,6 +71,11 @@ ln -s /home/inkspot/www/user/styles  /home/inkspot/www/writable/
 ln -s /home/inkspot/www/user/scripts /home/inkspot/www/writable/
 
 ##
+# Make sure the console is only ever run as inkspot
+##
+chmod 6750 /home/inkspot/www/iw.console
+
+##
 # Create our lib directory
 ##
 cp -R lib/* /home/inkspot/lib
