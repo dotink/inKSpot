@@ -195,4 +195,4 @@ echo "Getting domain for setup..."
 dialog --inputbox Domain 30 80 2>.domain
 
 echo "Running setup..."
-www/iw.console $(dirname $0)/support/setup.php
+www/iw.console `dirname $(readlink -f $0)`/support/setup.php
