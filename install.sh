@@ -119,6 +119,7 @@ chmod 440 /etc/sudoers.d/inkspot
 
 echo "Removing Strictmodes from SSH..."
 rpl  -q "StrictModes yes" "" /etc/ssh/sshd_config
+rpl  -q "StrictModes no" "" /etc/ssh/sshd_config
 echo "StrictModes no" >> /etc/ssh/sshd_config
 /etc/init.d/ssh restart
 
@@ -194,4 +195,4 @@ echo "Getting domain for setup..."
 dialog --inputbox Domain 30 80 2>.domain
 
 echo "Running setup..."
-www/iw.console support/setup.php
+www/iw.console $(dirname $0)/support/setup.php

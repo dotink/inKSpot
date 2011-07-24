@@ -53,7 +53,7 @@ CREATE TABLE domains (
 	description varchar(256) NOT NULL,
 	master varchar(128) DEFAULT NULL,
 	last_check int DEFAULT NULL,
-	type varchar(6) NOT NULL CHECK(type IN('MASTER', 'SLAVE', 'internal'))) DEFAULT 'MASTER',
+	type varchar(6) NOT NULL CHECK(type IN('MASTER', 'SLAVE', 'internal')) DEFAULT 'MASTER',
 	notified_serial INT DEFAULT NULL,
 	account VARCHAR(40) DEFAULT NULL		
 );
@@ -68,8 +68,6 @@ CREATE TABLE domain_records (
 	prio int4 DEFAULT NULL,
 	change_date int DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE TABLE domain_aliases
 
 CREATE INDEX rec_name_index ON records(name);
 CREATE INDEX nametype_index ON records(name,type);
