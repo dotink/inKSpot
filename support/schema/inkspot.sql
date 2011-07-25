@@ -26,7 +26,7 @@ CREATE TABLE users (
 	name varchar(48) DEFAULT '',
 	location varchar(64) DEFAULT '',
 	phone_number varchar(16) DEFAULT '',
-	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	group_id int4 REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	home varchar(512) NOT NULL,
 	shell varchar(512) NOT NULL DEFAULT '/usr/bin/rssh',
 	avatar varchar(512) DEFAULT NULL
@@ -36,11 +36,6 @@ CREATE TABLE user_groups (
 	group_id int4 NOT NULL REFERENCES groups(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	user_id int4 NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (group_id, user_id)
-);
-
-CREATE TABLE user_settings (
-	user_id integer PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	spam_level float NOT NULL DEFAULT '6.0'
 );
 
 CREATE TABLE user_friends (
@@ -57,7 +52,7 @@ CREATE TABLE domains (
 	description varchar(256) NOT NULL,
 	master varchar(128) DEFAULT NULL,
 	last_check int DEFAULT NULL,
-	type varchar(6) NOT NULL CHECK(type IN('MASTER', 'SLAVE', 'internal')) DEFAULT 'MASTER',
+	type varchar(6) NOT NULL CHECK(type IN('MASTER', 'SLAVE', 'NATIVE', 'internal')) DEFAULT 'MASTER',
 	notified_serial INT DEFAULT NULL,
 	account VARCHAR(40) DEFAULT NULL		
 );
@@ -83,33 +78,16 @@ CREATE TABLE domain_supermasters (
 	account varchar(40) DEFAULT NULL
 );
 
-CREATE TABLE domain_mail_settings (
-	domain_id integer PRIMARY KEY REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	mailboxes integer NOT NULL DEFAULT '0',
-	quota integer NOT NULL DEFAULT '0'
-);
-
-CREATE TABLE domain_web_settings (
-	domain_id integer PRIMARY KEY REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	quota integer NOT NULL DEFAULT '0'
-);
-
 CREATE TABLE domain_users (
-	id serial PRIMARY KEY,
 	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	username varchar(32) NOT NULL,
-	UNIQUE (username, domain_id)
-);
-
-CREATE TABLE domain_user_settings (
-	domain_user_id integer PRIMARY KEY REFERENCES domain_users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	spam_level float DEFAULT NULL
+	PRIMARY KEY (user_id, domain_id)
 );
 
 CREATE TABLE domain_user_aliases (
 	domain_user_id integer NOT NULL REFERENCES domain_users(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	alias varchar(384) NOT NULL,
+	is_primary boolean DEFAULT FALSE,
 	PRIMARY KEY (domain_user_id, alias)
 );
 
@@ -157,6 +135,12 @@ GRANT SELECT ON users TO inkspot_ro;
 GRANT SELECT ON groups TO inkspot_ro;
 GRANT SELECT ON user_groups TO inkspot_ro;
 
+INSERT INTO groups (id, groupname, description) VALUES (
+	9999,
+	'_everyone_',
+	'The _everyone_ group contains all users.'
+);
+
 INSERT INTO web_engines (name, cgi_path) VALUES('php5', '/usr/bin/php5-cgi');
 INSERT INTO web_engines (name, cgi_path) VALUES('ruby', '/usr/bin/ruby-cgi');
 
@@ -164,14 +148,14 @@ INSERT INTO web_configurations (name, web_engine_id, description, template) VALU
 	'PHP5',
 	(SELECT id FROM web_engines WHERE name = 'php5'),
 	'Standard PHP support for files ending with .php',
-	'/etc/inkspot/nginx/php.tmpl'
+	'/etc/inkspot/nginx/php.conf'
 );
 
 INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
 	'Ruby',
 	(SELECT id FROM web_engines WHERE name = 'ruby'),
 	'Standard Ruby support for files ending with .rb',
-	'/etc/inkspot/nginx/ruby.tmpl'
+	'/etc/inkspot/nginx/ruby.conf'
 );
 
 COMMIT;

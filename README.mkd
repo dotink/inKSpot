@@ -1,4 +1,7 @@
-# inKSpot - Hosting Made Easy
+# inKSpot [Social Hosting]
 
-inKSpot is a set of scripts for *nix like systems which provide ease of administrating web and e-mail hosting for
-a number of domains.
+inKSpot is a set of scripts which will install and configure a number of
+component pieces of software on Linux systems.  Once installed, an easy to use
+web environment is provided in order to manage the various sites hosted.  The
+system itself will be used for a public implementation which will provide
+additional features and paid for plans.

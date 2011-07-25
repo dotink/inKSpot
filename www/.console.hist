@@ -1,0 +1,16 @@
+echo preg_match('/[A-Za-z]([A-Za-z0-9_]*)/', '_fuck_you');
+echo preg_match('/^[A-Za-z]([A-Za-z0-9_]*)$/', '_fuck_you');
+echo preg_match('/^[A-Za-z]([A-Za-z0-9_]*)$/', 'fuck_you');
+echo preg_match('/^[A-Za-z]([A-Za-z0-9_]*)$/', '0fuck_you');
+echo preg_match('/^[A-Za-z]([A-Za-z0-9_]*)$/', '-fuck_you');
+echo preg_match('/^[a-z]([a-z0-9_]*)$/', '-fuck_you');
+echo preg_match('/^[a-z]([a-z0-9_]*)$/', 'Fuck_you');
+addgroup 09834
+\q
+$var = 0;
+$var |= 1;
+echo $var;
+$var = 0;
+$var |= 0;
+echo $var;
+\q

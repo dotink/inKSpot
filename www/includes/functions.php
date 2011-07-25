@@ -1,6 +1,7 @@
 <?php
 
-	function sexec($command, &$output = NULL, &$return = NULL)
+	function sexec($command, &$output = NULL)
 	{
-		return exec('sudo ' . $command, $output, $return);
+		exec('sudo ' . $command, $output, $return);
+		return $return;
 	}

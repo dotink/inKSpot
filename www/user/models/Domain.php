@@ -133,4 +133,90 @@
 			return parent::createFromResourceKey(__CLASS__, $resource_key);
 		}
 
+		/**
+		 * Adds trust between the domain and a user.  If the user is
+		 * already trusted then this will recreate the symbolic link in their
+		 * home directory.
+		 *
+		 * @access public
+		 * @param int|string|User The User, user id, or username to trust
+		 * @return void
+		 */
+		public function addTrust($user)
+		{
+			$user  = User::fetch($user);
+
+			if (!($trust = $this->fetchTrust($user)->exists())) {
+				$trust->store();
+			}
+
+			$domain   = $this->getName();
+			$dst_user = $user->getUsername();
+
+			$src      = '/home/domains/' . $domain . '/www/';
+			$dst      = '/home/users/' . $dst_user . '/www/' . $domain;
+
+			sexec('rm -rf ' . $dst);
+			sexec('ln -s  ' . $src . ' ' . $dst);
+		}
+
+		/**
+		 * Removes trust between the domain and a user
+		 *
+		 * @access public
+		 * @param int|string|User The User, user id, or username to trust
+		 * @return void
+		 */
+		public function removeTrust($user)
+		{
+			$user  = self::fetch($user);
+
+			if ($trust = $this->fetchTrust($user)->exists()) {
+				$trust->delete();
+			}
+
+			$domain   = $this->getName();
+			$dst_user = $user->getUsername();
+			$dst      = '/home/users/' . $dst_user . '/www/' . $domain;
+
+			sexec('rm -rf ' . $dst);
+		}
+
+		/**
+		 * Checks whether or not a user is trusted by the domain
+		 *
+		 * @access public
+		 * @param int|string|User The User, user id, or username to trust
+		 * @return boolean Whether or not the user is trusted
+		 */
+		public function checkTrust($user)
+		{
+			return $this->fetchTrust($user)->exists();
+		}
+
+		/**
+		 * Fetches a UserGroup (trust) object if it exists, or creates
+		 * a new one with the appropriate ids if it does not exist.
+		 *
+		 * @access public
+		 * @param int|string|User The User, user id, or username to trust
+		 * @return User The UserGroup object representing trust
+		 */
+		public function fetchTrust($user)
+		{
+			$group = $this->createGroup();
+			$user  = self::fetch($user);
+
+			try {
+				return new UserGroup(array(
+					'user_id'  => $user->getId(),
+					'group_id' => $group->getId()
+				));
+			} catch (fNotFoundException $e) {
+				$trust = new UserGroup();
+				$trust->setUserId($user->getId());
+				$trust->setGroupId($group->getId());
+				return $trust;
+			}
+		}
 	}

@@ -16,7 +16,9 @@ done
 
 dialog --yesno "Do you wish to update the system? (RECOMMENDED)" 5 80
 
-if [ $? == 0 ]; then
+clear
+
+if [ $? ]; then
 	echo "Updating..."
 	apt-get -qq update
 	apt-get -qq dist-upgrade
@@ -79,14 +81,7 @@ chown inkspot:inkspot /home/inkspot/www/writable/scripts
 chmod 6750 /home/inkspot/www/iw.console
 
 ##
-# Create our lib directory
-##
-cp -R lib/* /home/inkspot/lib
-chown -R inkspot:inkspot /home/inkspot/lib
-chmod -R 770 /home/inkspot/lib
-
-##
-# Create our NGINX directory
+# Create our NGINX configs directory
 ##
 mkdir /home/inkspot/nginx
 chown -R inkspot:inkspot /home/inkspot/nginx
@@ -138,18 +133,16 @@ done
 
 
 echo "Setting up inKSpot database and permissions..."
-password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+ro_password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
 echo "CREATE USER inkspot"                                    | sudo -u postgres psql
-echo "CREATE USER inkspot_ro PASSWORD '$password';"           | sudo -u postgres psql
+echo "CREATE USER inkspot_ro PASSWORD '$ro_password';"        | sudo -u postgres psql
 echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
-psql -U inkspot < support/inkspot.sql
-psql -U inkspot < support/auth.sql
-
-
+psql -U inkspot < support/schema/inkspot.sql
+psql -U inkspot < support/schema/auth.sql
 
 echo "Setting up PowerDNS database user and permissions"
-password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
-echo "CREATE USER inkspot_dns WITH PASSWORD '$password';"  | sudo -u postgres psql
+dns_password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+echo "CREATE USER inkspot_dns PASSWORD '$dns_password';"   | sudo -u postgres psql
 
 echo "Granting permissions to inkspot_dns user"
 echo "GRANT ALL ON domains TO inkspot_dns;"                | psql -U inkspot
@@ -159,34 +152,18 @@ echo "GRANT ALL ON domains_id_seq TO inkspot_dns;"         | psql -U inkspot
 echo "GRANT ALL ON domain_records_id_seq TO inkspot_dns;"  | psql -U inkspot
 
 echo "Setting up PAM for PostgreSQL..."
-cp etc/pam_pgsql.conf /etc/
+cp    etc/pam_pgsql.conf /etc/
 chmod 644 /etc/pam_pgsql.conf
-cp support/pam-configs/pgsql /usr/share/pam-configs/
+cp    support/pam-configs/pgsql /usr/share/pam-configs/
 pam-auth-update --package
 
 echo "Setting up NSS for PostgreSQL..."
-cp etc/nss-pgsql.conf /etc/
-rpl -q \$\{password\} $password /etc/nss-pgsql.conf >/dev/null
+cp    etc/nss-pgsql.conf /etc/
 chmod 644 /etc/nss-pgsql.conf
-
-cp etc/nss-pgsql-root.conf /etc/
+cp    etc/nss-pgsql-root.conf /etc/
 chmod 644 /etc/nss-pgsql-root.conf
-
-cp etc/nsswitch.conf /etc/
-
-echo "Setting up inKSpot hostsnames..."
-chmod 664 /etc/hosts
-echo >> /etc/hosts
-echo "# inKSpot Domains" >> /etc/hosts
-echo >> /etc/hosts
-echo "127.0.2.1 inkspot" >> /etc/hosts
-
-echo "Setting up NGINX..."
-cp etc/nginx/sites-available/inkspot /etc/nginx/sites-available/inkspot
-ln -s /etc/nginx/sites-available/inkspot /etc/nginx/sites-enabled/inkspot
-cp -R etc/inkspot/nginx /etc/inkspot/
-chown inkspot:inkspot /etc/inkspot/nginx
-/etc/init.d/nginx restart
+cp    etc/nsswitch.conf /etc/
+rpl -q \$\{password\} $ro_password /etc/nss-pgsql.conf >/dev/null
 
 echo "Setting up Spawn-FCGI environment..."
 mkdir /home/inkspot/var
@@ -195,8 +172,25 @@ mkdir /home/inkspot/var/cgi/domains
 mkdir /home/inkspot/var/cgi/users
 chown -R inkspot:inkspot /home/inkspot/var
 
-echo "Getting domain for setup..."
-dialog --inputbox Domain 30 80 2>.domain
+echo "Setting up PowerDNS..."
+cp    etc/powerdns/pdns.conf /etc/powerdns
+cp    etc/powerdns/recursor.conf /etc/powerdns
+cp    etc/powerdns/pdns.d/inkspot.conf /etc/powerdns/pdns.d
+chown pdns:inkspot /etc/powerdns/pdns.d/inkspot.conf
+chmod 660 /etc/powerdns/pdns.d/inkspot.conf
+chmod 664 /etc/resolv.conf
+cp    etc/network/if-up.d/powerdns /etc/network/if-up.d
+rpl -q \$\{password\} $dns_password /etc/powerdns/pdns.d/inkspot.conf
+invoke-rc.d pdns-recursor restart
+invoke-rc.d pdns restart
+invoke-rc.d networking restart
+
+echo "Setting up NGINX..."
+cp    etc/nginx/sites-available/inkspot /etc/nginx/sites-available/inkspot
+ln -s /etc/nginx/sites-available/inkspot /etc/nginx/sites-enabled/inkspot
+invoke-rc.d nginx restart
 
 echo "Running setup..."
+sleep 10
+clear
 www/iw.console `dirname $(readlink -f $0)`/support/setup.php

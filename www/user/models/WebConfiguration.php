@@ -10,7 +10,7 @@
 	class WebConfiguration extends ActiveRecord
 	{
 
-		const STANDARD_CONFIGURATION = '/etc/inkspot/nginx/config.tmpl';
+		const STANDARD_CONFIGURATION = '/etc/inkspot/nginx/config.conf';
 
 		/**
 		 * Initializes all static class information for the WebConfiguration model
