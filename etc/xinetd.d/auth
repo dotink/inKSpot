@@ -1,0 +1,8 @@
+service auth {
+	disable     = no
+	socket_type = stream
+	protocol    = tcp
+	wait        = no
+	user        = root
+	server      = /usr/sbin/slidentd
+}
