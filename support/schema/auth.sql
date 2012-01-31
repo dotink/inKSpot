@@ -7,7 +7,7 @@ CREATE TABLE auth.user_shadows (
 	login_password varchar(512) DEFAULT NULL,
 	last_change_days int NOT NULL DEFAULT CURRENT_DATE - DATE '1970-01-01',
 	min_change_days int NOT NULL DEFAULT '0',
-	max_change_days int NOT NULL DEFAULT '9999',
+	max_change_days int NOT NULL DEFAULT '99999',
 	warn_days int4 NOT NULL DEFAULT '7',
 	disable_inactive_days int4 DEFAULT '7',
 	expiration_days int DEFAULT '36500',

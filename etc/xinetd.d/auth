@@ -1,4 +1,5 @@
-service auth {
+service auth
+{
 	disable     = no
 	socket_type = stream
 	protocol    = tcp

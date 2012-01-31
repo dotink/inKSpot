@@ -83,12 +83,12 @@ apt-get -qq install rssh                              # Restricted Shell
 apt-get -qq install libpam-pgsql libnss-pgsql2        # Database Auth
 apt-get -qq install php5 php5-cli php5-fpm php5-pgsql # PHP Stuff
 apt-get -qq install nginx                             # WebServer Stack
+apt-get -qq install nscd                              # NSCD (This resolves tons of issues)
 
 echo "Setting up PAM for PostgreSQL..."
 cp    etc/pam_pgsql.conf /etc/
 chmod 644 /etc/pam_pgsql.conf
 cp    support/pam-configs/pgsql /usr/share/pam-configs/
-pam-auth-update --package
 
 echo "Setting up NSS for PostgreSQL..."
 cp    etc/nss-pgsql.conf /etc/
@@ -159,20 +159,14 @@ if [ $res == 0 ]; then
 	service postgresql restart
 
 	echo "Setting up inKSpot database and permissions..."
-	ro_password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
 	echo "CREATE USER inkspot"                                    | sudo -u postgres psql
-	echo "CREATE USER inkspot_ro PASSWORD '$ro_password';"        | sudo -u postgres psql
+	echo "CREATE USER inkspot_ro;"                                | sudo -u postgres psql
 	echo "CREATE DATABASE inkspot OWNER inkspot ENCODING 'UTF8';" | sudo -u postgres psql
 	psql -U inkspot < support/schema/inkspot.sql
 	psql -U inkspot < support/schema/auth.sql
 	echo "GRANT SELECT ON users TO inkspot_ro;"                   | psql -U inkspot
 	echo "GRANT SELECT ON groups TO inkspot_ro;"                  | psql -U inkspot
 	echo "GRANT SELECT ON user_groups TO inkspot_ro;"             | psql -U inkspot
-
-	##
-	# Replace password for NSS
-	##
-	rpl -q \$\{password\} $ro_password /etc/nss-pgsql.conf >/dev/null
 
 	##
 	# Power DNS Setup
@@ -203,11 +197,12 @@ if [ $res == 0 ]; then
 	rpl -q \$\{password\} $dns_password /etc/powerdns/pdns.d/inkspot.conf
 
 	##
-	# Restart Services
+	# Restart Services and update PAM
 	##
 	service pdns-recursor restart
 	service pdns restart
 	service networking restart
+	pam-auth-update --package
 
 	dialog --yesno "Is this system going to be a mail server?" 5 80; res=$?; clear
 
@@ -227,7 +222,7 @@ else
 
 	echo "Setting up identd..."
 	cp etc/xinetd.d/auth /etc/xinetd.d/
-	chmod 660 /etc/xinetd.d/auth
+	chmod 640 /etc/xinetd.d/auth
 
 	##
 	# Restart Services
