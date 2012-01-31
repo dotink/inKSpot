@@ -1,2 +1,2 @@
 Defaults umask_override, umask=007
-inkspot ALL = NOPASSWD: /bin/chown, /bin/chmod, /bin/chgrp, /bin/kill, /usr/bin/chattr, /usr/sbin/service
+inkspot ALL=(ALL) NOPASSWD: /bin/chown, /bin/chmod, /bin/chgrp, /bin/kill, /usr/bin/chattr, /usr/sbin/service
