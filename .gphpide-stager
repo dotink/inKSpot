@@ -1,5 +1,0 @@
-server          = 192.168.1.11
-authed_user     = root
-local_root      = /home/gent/Projects/inKSpot
-document_root   = /root/inKSpot
-exclude         = www/writable

@@ -7,12 +7,6 @@ CREATE FUNCTION epoch_seconds() RETURNS integer
 CREATE SEQUENCE group_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 CREATE SEQUENCE user_id MINVALUE 10000 MAXVALUE 2147483647 NO CYCLE;
 
-CREATE TABLE activation_requests (
-	key varchar(256) NOT NULL PRIMARY KEY,
-	name varchar(64) NOT NULL,
-	email_address varchar(256) NOT NULL UNIQUE
-);
-
 CREATE TABLE groups (
 	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('group_id'),
 	groupname varchar(64) NOT NULL,
@@ -54,7 +48,7 @@ CREATE TABLE domains (
 	last_check int DEFAULT NULL,
 	type varchar(6) NOT NULL CHECK(type IN('MASTER', 'SLAVE', 'NATIVE', 'internal')) DEFAULT 'MASTER',
 	notified_serial INT DEFAULT NULL,
-	account VARCHAR(40) DEFAULT NULL		
+	account VARCHAR(40) DEFAULT NULL
 );
 
 CREATE TABLE domain_records (
@@ -84,78 +78,8 @@ CREATE TABLE domain_users (
 	PRIMARY KEY (user_id, domain_id)
 );
 
-CREATE TABLE domain_user_aliases (
-	domain_user_id integer NOT NULL REFERENCES domain_users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	alias varchar(384) NOT NULL,
-	is_primary boolean DEFAULT FALSE,
-	PRIMARY KEY (domain_user_id, alias)
-);
-
-CREATE TABLE web_engines (
-	id serial PRIMARY KEY NOT NULL,
-	name varchar(16) NOT NULL UNIQUE,
-	cgi_path varchar(512) NOT NULL
-);
-
-CREATE TABLE user_web_engines (
-	web_engine_id integer NOT NULL  REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	pid integer DEFAULT NULL,
-	PRIMARY KEY (web_engine_id, user_id)
-);
-
-CREATE TABLE domain_web_engines (
-	web_engine_id integer NOT NULL  REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	pid integer DEFAULT NULL,
-	PRIMARY KEY (web_engine_id, domain_id)
-);
-
-CREATE TABLE web_configurations (
-	id serial PRIMARY KEY NOT NULL,
-	web_engine_id integer NOT NULL REFERENCES web_engines(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	name varchar(128) NOT NULL UNIQUE,
-	description text NOT NULL,
-	template varchar(512) NOT NULL	
-);
-
-CREATE TABLE user_web_configurations (
-	user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	web_configuration_id integer NOT NULL REFERENCES web_configurations(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	PRIMARY KEY (user_id, web_configuration_id)
-);
-
-CREATE TABLE domain_web_configurations (
-	domain_id integer NOT NULL REFERENCES domains(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	web_configuration_id integer NOT NULL REFERENCES web_configurations(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	PRIMARY KEY (domain_id, web_configuration_id)
-);
-
-GRANT SELECT ON users TO inkspot_ro;
-GRANT SELECT ON groups TO inkspot_ro;
-GRANT SELECT ON user_groups TO inkspot_ro;
-
 INSERT INTO groups (id, groupname, description) VALUES (
-	9999,
-	'_everyone_',
-	'The _everyone_ group contains all users.'
-);
-
-INSERT INTO web_engines (name, cgi_path) VALUES('php5', '/usr/bin/php5-cgi');
-INSERT INTO web_engines (name, cgi_path) VALUES('ruby', '/usr/bin/ruby-cgi');
-
-INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
-	'PHP5',
-	(SELECT id FROM web_engines WHERE name = 'php5'),
-	'Standard PHP support for files ending with .php',
-	'/etc/inkspot/nginx/php.conf'
-);
-
-INSERT INTO web_configurations (name, web_engine_id, description, template) VALUES(
-	'Ruby',
-	(SELECT id FROM web_engines WHERE name = 'ruby'),
-	'Standard Ruby support for files ending with .rb',
-	'/etc/inkspot/nginx/ruby.conf'
+	9999, '_everyone_', 'The _everyone_ group contains all users.'
 );
 
 COMMIT;
