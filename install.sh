@@ -89,6 +89,8 @@ echo "Setting up PAM for PostgreSQL..."
 cp    etc/pam_pgsql.conf /etc/
 chmod 644 /etc/pam_pgsql.conf
 cp    support/pam-configs/pgsql /usr/share/pam-configs/
+pam-auth-update --package
+
 
 echo "Setting up NSS for PostgreSQL..."
 cp    etc/nss-pgsql.conf /etc/
@@ -171,8 +173,9 @@ if [ $res == 0 ]; then
 	##
 	# Power DNS Setup
 	##
-	echo "Setting up PowerDNS database user and permissions"
 	dns_password=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c 16 | xargs`
+
+	echo "Setting up PowerDNS database user and permissions"
 	echo "CREATE USER inkspot_dns PASSWORD '$dns_password';"   | sudo -u postgres psql
 
 	echo "Granting permissions to inkspot_dns user"
@@ -197,12 +200,11 @@ if [ $res == 0 ]; then
 	rpl -q \$\{password\} $dns_password /etc/powerdns/pdns.d/inkspot.conf
 
 	##
-	# Restart Services and update PAM
+	# Restart Services
 	##
 	service pdns-recursor restart
 	service pdns restart
 	service networking restart
-	pam-auth-update --package
 
 	dialog --yesno "Is this system going to be a mail server?" 5 80; res=$?; clear
 
@@ -216,9 +218,13 @@ if [ $res == 0 ]; then
 		echo "Running freshclam for the first time..."
 		freshclam
 	fi
+
+	master_host="127.0.0.1"
+	echo $master_host  > /etc/inkspot/master_host
+
 else
 	echo "Installing slave services..."
-	apt-get -qq install xinetd slidentd # Inet and Ident Services
+	apt-get -qq install xinetd pidentd # Inet and Ident Services
 
 	echo "Setting up identd..."
 	cp etc/xinetd.d/auth /etc/xinetd.d/
@@ -257,8 +263,4 @@ else
 			break
 		fi
 	done
-
 fi
-
-
-

@@ -5,5 +5,5 @@ service auth
 	protocol    = tcp
 	wait        = no
 	user        = root
-	server      = /usr/sbin/slidentd
+	server      = /usr/sbin/identd
 }
