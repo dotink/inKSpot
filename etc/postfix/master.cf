@@ -6,9 +6,80 @@
 # service type  private unpriv  chroot  wakeup  maxproc command + args
 #               (yes)   (yes)   (yes)   (never) (100)
 # ==========================================================================
-smtp      inet  n       -       -       -       -       smtpd
+
+##
+# For incoming mail on SMTP, send to ClamSMTPD
+##
+
+smtp            inet  n       -       -       -       -       smtpd
+  -o content_filter=scan:127.0.0.1:10021
+
+##
+# Receive from ClamSMTPD, Send to DKIM In
+##
+
+127.0.0.1:10022 inet  n       -       n       -       16      smtpd
+  -o content_filter=scan:127.0.0.1:10023
+  -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
+  -o smtpd_sender_restrictions=
+  -o smtpd_recipient_restrictions=permit_mynetworks,reject
+  -o mynetworks_style=host
+  -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+
+##
+# Receive from DKIM In, Send to SpamPD
+##
+
+127.0.0.1:10024 inet  n       -       n       -       16      smtpd
   -o content_filter=scan:127.0.0.1:10025
-pickup    fifo  n       -       -       60      1       pickup
+  -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
+  -o smtpd_sender_restrictions=
+  -o smtpd_recipient_restrictions=permit_mynetworks,reject
+  -o mynetworks_style=host
+  -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+
+##
+# Receive from SpamPD, end of line
+##
+
+127.0.0.1:10026 inet  n       -       n       -       16      smtpd
+  -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
+  -o smtpd_sender_restrictions=
+  -o smtpd_recipient_restrictions=permit_mynetworks,reject
+  -o mynetworks_style=host
+  -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+
+##
+# For incoming mail on Submission, Send to DKIM Out
+##
+
+submission      inet  n       -       -       -       -       smtpd
+  -o content_filter=scan:127.0.0.1:10027
+  -o smtpd_recipient_restrictions=reject_unauth_pipelining, permit_sasl_authenticated, permit_mynetworks, reject
+  -o smtpd_sender_restrictions=reject_unauth_pipelining, permit_sasl_authenticated, permit_mynetworks, reject
+
+##
+# Receive Postdropped Mail, Send to DKIM Out
+##
+
+pickup          fifo  n       -       -       60      1       pickup
+  -o content_filter=scan:127.0.0.1:10027
+
+##
+# Receive from DKIM Out
+##
+
+127.0.0.1:10028 inet  n       -       n       -       16      smtpd
+  -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
+  -o smtpd_sender_restrictions=
+  -o smtpd_recipient_restrictions=permit_mynetworks,reject
+  -o mynetworks_style=host
+  -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+
+##
+# Internal Processing
+##
+
 cleanup   unix  n       -       -       -       0       cleanup
 qmgr      fifo  n       -       n       300     1       qmgr
 tlsmgr    unix  -       -       -       1000?   1       tlsmgr
@@ -19,8 +90,6 @@ trace     unix  -       -       -       -       0       bounce
 verify    unix  -       -       -       -       1       verify
 flush     unix  n       -       -       1000?   0       flush
 proxymap  unix  -       -       n       -       -       proxymap
-smtp      unix  -       -       -       -       -       smtp
-  -o content_filter=scan:127.0.0.1:10025
 relay     unix  -       -       -       -       -       smtp
   -o fallback_relay=
 showq     unix  n       -       -       -       -       showq
@@ -33,58 +102,13 @@ anvil     unix  -       -       -       -       1       anvil
 scache    unix  -       -       -       -       1       scache
 scan      unix  -       -       n       -       16      smtp
   -o smtp_send_xforward_command=yes
+  -o smtp_discard_ehlo_keywords=8bitmime,starttls
+  -o disable_mime_output_conversion=yes
+smtp      unix  -       -       -       -       -       smtp
 
-127.0.0.1:10026 inet  n -       n       -       16      smtpd
-  -o content_filter=spamassassin
-  -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
-  -o smtpd_helo_restrictions=
-  -o smtpd_client_restrictions=
-  -o smtpd_sender_restrictions=
-  -o smtpd_recipient_restrictions=permit_mynetworks,reject
-  -o mynetworks_style=host
-  -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+##
+# External Delivery Agents
+##
 
+retry           unix  -       -       -       -       -       error
 
-#
-# ====================================================================
-# Interfaces to non-Postfix software. Be sure to examine the manual
-# pages of the non-Postfix software to find out what options it wants.
-#
-# Many of the following services use the Postfix pipe(8) delivery
-# agent.  See the pipe(8) man page for information about ${recipient}
-# and other message envelope options.
-# ====================================================================
-#
-# maildrop. See the Postfix MAILDROP_README file for details.
-# Also specify in main.cf: maildrop_destination_recipient_limit=1
-#
-
-maildrop  unix  -       n       n       -       -       pipe
-  flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
-
-#
-# See the Postfix UUCP_README file for configuration details.
-#
-
-uucp      unix  -       n       n       -       -       pipe
-  flags=Fqhu user=uucp argv=uux -r -n -z -a$sender - $nexthop!rmail ($recipient)
-
-#
-
-#
-# Other external delivery methods.
-# 
-
-ifmail    unix  -       n       n       -       -       pipe
-  flags=F user=ftn argv=/usr/lib/ifmail/ifmail -r $nexthop ($recipient)
-bsmtp     unix  -       n       n       -       -       pipe
-  flags=Fq. user=bsmtp argv=/usr/lib/bsmtp/bsmtp -t $nexthop -f $sender $recipient
-scalemail-backend unix  -       n       n       -       2       pipe
-  flags=R user=scalemail argv=/usr/lib/scalemail/bin/scalemail-store ${nexthop} ${user} ${extension}
-mailman   unix  -       n       n       -       -       pipe
-  flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
-  ${nexthop} ${user}
-spamassassin unix -     n       n       -       -       pipe
-  user=spamd argv=/usr/bin/spamc -f -e
-  /home/inkspot/bin/sasendmail -oi -f $sender $recipient
-retry     unix  -       -       -       -       -       error

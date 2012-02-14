@@ -58,6 +58,14 @@ chown -R inkspot:inkspot /home/inkspot/nginx
 chmod -R 770 /home/inkspot/nginx
 
 ##
+# Create our SSL Structure
+##
+mkdir /home/inkspot/ssl
+mkdir /home/inkspot/ssl/pkeys
+mkdir /home/inkspot/ssl/certs
+mkdir /home/inkspot/ssl/public
+
+##
 # Give inkspot a configuration home and copy defaults
 ##
 mkdir /etc/inkspot
@@ -108,8 +116,8 @@ cp etc/rssh.conf /etc/rssh.conf
 # Remove strict modes from SSH
 ##
 rpl  -q "StrictModes yes" "" /etc/ssh/sshd_config
-rpl  -q "StrictModes no" "" /etc/ssh/sshd_config
-echo "StrictModes no" >> /etc/ssh/sshd_config
+rpl  -q "StrictModes no" ""  /etc/ssh/sshd_config
+echo "StrictModes no" >>     /etc/ssh/sshd_config
 
 ##
 # Restart Services
@@ -206,17 +214,41 @@ if [ $res == 0 ]; then
 	service pdns restart
 	service networking restart
 
-	dialog --yesno "Is this system going to be a mail server?" 5 80; res=$?; clear
+	dialog --yesno "Is this system going to provide outgoing (SMTP) mail services?" 5 80; res=$?; clear
 
 	if [ $res == 0 ]; then
 		echo "Installing mail server requirements..."
 		apt-get -qq install postfix postfix-pgsql                      # Incoming Server
-		apt-get -qq install dovecot-common dovecot-imapd dovecot-pop3d # Outgoing Servers
-		apt-get -qq install spamassassin                               # Spam Assassin
+		apt-get -qq install dovecot-common                             # Dovecot for Authentication
+		apt-get -qq install spamassassin spampd                        # Spam Assassin
 		apt-get -qq install clamsmtp clamav-freshclam                  # Anti-Virus
+		apt-get -qq install dkimproxy                                  # DKIM Proxy
+
+		cp    etc/postfix/main.cf              /etc/postfix/
+		cp    etc/postfix/master.cf            /etc/postfix/
+		cp    etc/dovecot/dovecot.conf         /etc/dovecot/
+		cp    etc/clamsmtpd.conf               /etc/
+		cp    etc/dkimproxy/dkimproxy_in.conf  /etc/dkimproxy/
+		cp    etc/dkimproxy/dkimproxy_out.conf /etc/dkimproxy/
+		cp    etc/dkimproxy/sender_map.conf    /etc/dkimproxy/
+		cp -R etc/inkspot/postfix              /etc/inkspot/
 
 		echo "Running freshclam for the first time..."
 		freshclam
+
+		service clamsmtp  restart
+		service dkimproxy restart
+		service spampd    restart
+		service dovecot   restart
+		service postfix   restart
+	fi
+
+	dialog --yesno "Is this system going to provide incoming (IMAP/POP3) mail services?" 5 80; res=$?; clear
+ 	if [ $res == 0 ]; then
+	 	apt-get -qq install dovecot-imapd dovecot-pop3d
+
+	 	# REPLACE "#protocols = imaps pop3s" with uncommented version in dovecot config
+	 	# RESTART SERVICES
 	fi
 
 	master_host="127.0.0.1"

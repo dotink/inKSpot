@@ -1,4 +1,4 @@
 user   = inkspot
-hosts  = localhost
+hosts  = ${master_host}
 dbname = inkspot
-query  = SELECT domain FROM domains WHERE domain='%s'
+query  = SELECT name FROM domains WHERE name='%s' AND mail_service = 'backup'

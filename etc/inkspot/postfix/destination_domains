@@ -1,0 +1,4 @@
+user   = inkspot
+hosts  = ${master_host}
+dbname = inkspot
+query  = SELECT name FROM domains WHERE name='%s' AND mail_service = 'primary'
