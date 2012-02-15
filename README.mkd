@@ -1,7 +1,3 @@
 # inKSpot [Social Hosting]
 
-inKSpot is a set of scripts which will install and configure a number of
-component pieces of software on Linux systems.  Once installed, an easy to use
-web environment is provided in order to manage the various sites hosted.  The
-system itself will be used for a public implementation which will provide
-additional features and paid for plans.
+inKSpot is currently relegated to pre-alpha software.  It amounts, as of now, to nothing more than a killer bootstrap for robust servers running on Debian.
